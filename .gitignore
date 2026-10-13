@@ -1,0 +1,20 @@
+.venv
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.env
+.env.*
+!.env.example
+models/*
+!models/.gitkeep
+artifacts/*
+!artifacts/.gitkeep
+node_modules
+test-results/
+playwright-report/
+backups/
+*.log
+.runtime/
+
+# macOS metadata
+.DS_Store

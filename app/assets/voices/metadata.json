@@ -1,0 +1,25 @@
+{
+  "male": {
+    "name": "Геннадий",
+    "text": "Здравствуйте! Меня зовут Геннадий. Я ваш виртуальный помощник. Давайте спокойно разберём ваш вопрос и выберем удобное время для записи.",
+    "description": "A native Russian man speaking standard Russian with no foreign accent. His voice is soft, calm and friendly, with a low warm baritone, smooth chest resonance, and gentle conversational pacing. Mature adult male, not theatrical, not gravelly, not overly deep. Clear Russian vowels and consonants.",
+    "file": "male.wav",
+    "source": "Qwen3-TTS-1.7B-VoiceDesign synthetic generation",
+    "revision": "5c390979e4b93af5f2932f90742ca99c7dd04687",
+    "seconds": 12.8
+  },
+  "female": {
+    "name": "Мария",
+    "file": "female.wav",
+    "text": "Здравствуйте. Меня зовут Мария. Я внимательно вас слушаю. Расскажите, пожалуйста, чем я могу помочь. Давайте вместе спокойно разберём ваш вопрос.",
+    "description": "A native Russian woman aged around forty with a distinctly low contralto speaking voice. Rich dark velvet timbre, smooth chest resonance, gentle and reassuring. Clear clean vocal tone, unforced normal speaking volume, not whispered or breathy. Natural Russian conversational rhythm, precise diction, clear vowels and complete word endings.",
+    "seconds": 12.88,
+    "seed": 202610431,
+    "source": "Qwen3-TTS-1.7B-VoiceDesign synthetic generation",
+    "revision": "5c390979e4b93af5f2932f90742ca99c7dd04687",
+    "voice_id": "maria-velvet",
+    "label": "Низкий бархатный",
+    "accepted_by_user": true,
+    "accepted_date": "2026-10-13"
+  }
+}

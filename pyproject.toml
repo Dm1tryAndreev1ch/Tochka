@@ -1,0 +1,22 @@
+[project]
+name = "voice-desk"
+version = "0.1.0"
+description = "Local Russian voice receptionist with transactional bookings"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "fastapi", "uvicorn[standard]", "asyncpg", "pydantic-settings", "httpx",
+  "python-multipart", "numpy", "pipecat-ai[webrtc,silero]", "faster-whisper", "piper-tts",
+  "mlx-audio==0.5.8", "soxr", "num2words", "qrcode[pil]", "py-tgcalls==3.0.0", "telethon==1.45.0"
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]

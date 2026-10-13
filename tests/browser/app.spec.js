@@ -1,0 +1,125 @@
+import {test,expect} from '@playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const env=Object.fromEntries(fs.readFileSync('.env','utf8').split('\n').filter(l=>l.includes('=')&&!l.startsWith('#')).map(l=>{const i=l.indexOf('=');return[l.slice(0,i),l.slice(i+1)]}));
+const tomorrow=()=>{let d=new Date(Date.now()+86400000);while([0].includes(d.getUTCDay()))d=new Date(+d+86400000);return new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Minsk',year:'numeric',month:'2-digit',day:'2-digit'}).format(d)};
+test.use({permissions:['microphone'],launchOptions:{args:['--use-fake-ui-for-media-stream','--use-fake-device-for-media-stream',`--use-file-for-fake-audio-capture=${path.resolve('artifacts/voice-test-input.wav')}`]}});
+
+test('public page, consent, booking confirmation, private management and operator view',async({page})=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/');
+ await expect(page.getByRole('heading',{name:'Хороший разговор. Точная запись.'})).toBeVisible();
+ await page.getByRole('button',{name:'Начать разговор',exact:false}).click();
+ await expect(page.getByRole('status')).toContainText('согласие');
+ await page.getByRole('checkbox').check();
+ await page.getByRole('button',{name:/01.*Консультация/}).click();
+ await expect(page.getByRole('dialog')).toBeVisible();
+ await page.locator('#booking-date').fill(tomorrow());
+ await expect(page.locator('#booking-time option').first()).not.toHaveText(/Загружаем|Нет свободного/);
+ await page.locator('#booking-name').fill('Тест браузера');
+ await page.locator('#booking-phone').fill('+375 29 123 45 67');
+ await page.getByRole('button',{name:'Проверить и продолжить →'}).click();
+ await expect(page.getByRole('dialog')).not.toBeVisible();
+ await expect(page.locator('.confirmation-card')).toContainText('30 BYN');
+ await page.getByRole('button',{name:'Да, подтверждаю'}).click();
+ await expect(page.locator('.result-card')).toContainText('Запись подтверждена');
+ const management=await page.locator('.result-card a').getAttribute('href');
+ await page.screenshot({path:'artifacts/client-booking.png',fullPage:true});
+ await page.goto(management);
+ await expect(page.getByRole('heading',{name:'Всё запланировано'})).toBeVisible();
+ await page.getByRole('button',{name:'Отменить запись',exact:true}).click();
+ await expect(page.locator('#confirmation')).toContainText('Отменить запись?');
+ await page.getByRole('button',{name:'Оставить как есть'}).click();
+ await expect(page.getByRole('heading',{name:'Всё запланировано'})).toBeVisible();
+ await page.getByRole('button',{name:'Отменить запись',exact:true}).click();
+ await page.getByRole('button',{name:'Да, подтверждаю'}).click();
+ await expect(page.getByRole('heading',{name:'Запись отменена'})).toBeVisible();
+ await page.goto('/operator');
+ await page.getByLabel('Пароль').fill(env.ADMIN_PASSWORD);
+ await page.getByRole('button',{name:'Войти в кабинет →'}).click();
+ await expect(page.getByRole('heading',{name:'Всё под контролем'})).toBeVisible();
+ await expect(page.getByText('Тест браузера',{exact:true}).first()).toBeVisible();
+ await page.screenshot({path:'artifacts/operator-overview.png',fullPage:true});
+ await page.getByRole('button',{name:'Обращения',exact:true}).click();
+ await page.getByRole('button',{name:'Открыть →'}).first().click();
+ await page.locator('#request-status').selectOption('in_progress');
+ await page.getByRole('button',{name:'Сохранить',exact:true}).click();
+ await expect(page.getByRole('cell',{name:'В работе',exact:true}).first()).toBeVisible();
+ expect(errors).toEqual([]);
+});
+
+test('chat uses a real local LLM, operator handoff stops automatic answers',async({browser})=>{
+ const c=await browser.newContext();const o=await browser.newContext();
+ const client=await c.newPage(),operator=await o.newPage();
+ await expect.poll(async()=>{const r=await client.request.get('/api/v1/health/ready');return (await r.json()).llm},{timeout:60000}).toBe(true);
+ await operator.goto('/operator');await operator.getByLabel('Пароль').fill(env.ADMIN_PASSWORD);await operator.getByRole('button',{name:'Войти в кабинет →'}).click();
+ await expect(operator.getByRole('heading',{name:'Всё под контролем'})).toBeVisible();
+ if(!await operator.getByRole('checkbox',{name:'Доступен для перевода'}).isChecked())await operator.getByRole('checkbox',{name:'Доступен для перевода'}).check();
+ await client.goto('/');await client.getByRole('checkbox').check();
+ await client.locator('#message').fill('Как оплачиваются ваши услуги?');await client.getByRole('button',{name:'Отправить сообщение'}).click();
+ await expect(client.locator('.bubble.assistant').last()).toContainText(/на месте|месте/,{timeout:45000});
+ await client.getByRole('button',{name:'Позвать сотрудника'}).click();
+ await expect(client.getByRole('status')).toContainText('Запрос отправлен');
+ await operator.getByRole('button',{name:'Разговоры',exact:true}).click();
+ await operator.locator('.session-item').filter({hasText:'Ждёт сотрудника'}).first().click();
+ await operator.getByRole('button',{name:'Принять разговор'}).click();
+ await expect(operator.locator('#operator-message')).toBeVisible();
+ await operator.locator('#operator-message').fill('Здравствуйте! Это тестовый оператор.');await operator.getByRole('button',{name:'Отправить ответ'}).click();
+ await expect(client.locator('.bubble.operator')).toContainText('тестовый оператор');
+ await client.locator('#message').fill('Спасибо, ещё один вопрос');await client.getByRole('button',{name:'Отправить сообщение'}).click();
+ await expect(client.locator('.bubble.assistant').last()).toContainText('Сообщение передано сотруднику');
+ await client.getByRole('button',{name:'Начать новый разговор'}).click();
+ await operator.getByRole('checkbox',{name:'Доступен для перевода'}).uncheck();
+ await c.close();await o.close();
+});
+
+test('mobile layout has no horizontal overflow and forms remain usable',async({page})=>{
+ await page.setViewportSize({width:390,height:844});await page.goto('/');
+ await expect(page.getByRole('heading',{name:'Давайте поговорим'})).toBeVisible();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+ await page.screenshot({path:'artifacts/client-mobile.png',fullPage:true});
+ await page.getByRole('checkbox').check();await page.getByRole('button',{name:'Оставить вопрос сотруднику ↗'}).click();
+ await expect(page.getByRole('dialog')).toBeVisible();
+ await page.getByRole('button',{name:'Закрыть',exact:true}).last().click();
+ await page.getByRole('button',{name:'Начать новый разговор'}).click();
+});
+
+test.describe('actual WebRTC voice',()=>{
+ test('Russian microphone audio is transcribed and synthesized reply arrives over RTC',async({page})=>{
+  await expect.poll(async()=>{const r=await page.request.get('/api/v1/health/ready');return (await r.json()).voice_available},{timeout:60000}).toBe(true);
+  await page.goto('/');await page.getByRole('checkbox').check();
+  await page.getByRole('button',{name:'Начать разговор',exact:false}).click();
+  await expect(page.locator('#end-call')).toBeVisible({timeout:30000});
+  await expect(page.locator('.bubble.user')).toContainText(/стоит.*консультац/i,{timeout:45000});
+  await expect(page.locator('.bubble.assistant').last()).toContainText(/30|тридцать/,{timeout:30000});
+  const received=await page.evaluate(async()=>{const audio=document.querySelector('#remote-audio');const ctx=new AudioContext();const source=ctx.createMediaStreamSource(audio.srcObject);const analyser=ctx.createAnalyser();source.connect(analyser);const data=new Float32Array(analyser.fftSize);let max=0;for(let i=0;i<100;i++){analyser.getFloatTimeDomainData(data);max=Math.max(max,...data.map(Math.abs));await new Promise(r=>setTimeout(r,30))}await ctx.close();return max;});
+  expect(received).toBeGreaterThan(.001);
+  await page.getByRole('button',{name:'Выключить микрофон'}).click();await expect(page.locator('#call-title')).toHaveText('Микрофон выключен');
+  await page.getByRole('button',{name:'Завершить',exact:true}).click();
+  await expect(page.locator('#start-call')).toBeVisible();
+ });
+ test('a live operator and client exchange audio through the server bridge',async({browser})=>{
+  const c=await browser.newContext({permissions:['microphone']}),o=await browser.newContext({permissions:['microphone']});
+  const client=await c.newPage(),operator=await o.newPage();
+  await expect.poll(async()=>{const r=await client.request.get('/api/v1/health/ready');return (await r.json()).voice_available},{timeout:60000}).toBe(true);
+  await operator.goto('/operator');await operator.getByLabel('Пароль').fill(env.ADMIN_PASSWORD);await operator.getByRole('button',{name:'Войти в кабинет →'}).click();
+  await expect(operator.getByRole('heading',{name:'Всё под контролем'})).toBeVisible();
+  await operator.getByRole('checkbox',{name:'Доступен для перевода'}).check();
+  await client.goto('/');await client.getByRole('checkbox').check();await client.getByRole('button',{name:'Начать разговор',exact:false}).click();
+  await expect(client.locator('#end-call')).toBeVisible({timeout:30000});
+  await client.getByRole('button',{name:'Позвать сотрудника'}).click();
+  await expect(client.getByRole('status')).toContainText('Запрос отправлен');
+  await operator.getByRole('button',{name:'Разговоры',exact:true}).click();
+  await operator.locator('.session-item').filter({hasText:'Ждёт сотрудника'}).first().click();
+  await operator.getByRole('button',{name:'Принять разговор'}).click();
+  await expect(operator.locator('#operator-message')).toBeVisible({timeout:20000});
+  const peak=async page=>page.evaluate(async()=>{const element=document.querySelector('audio');const ctx=new AudioContext();const analyser=ctx.createAnalyser();ctx.createMediaStreamSource(element.srcObject).connect(analyser);const data=new Float32Array(analyser.fftSize);let max=0;for(let i=0;i<600;i++){analyser.getFloatTimeDomainData(data);max=Math.max(max,...data.map(Math.abs));await new Promise(r=>setTimeout(r,25));}await ctx.close();return max;});
+  const [clientPeak,operatorPeak]=await Promise.all([peak(client),peak(operator)]);
+  expect(clientPeak).toBeGreaterThan(.001);expect(operatorPeak).toBeGreaterThan(.001);
+  await expect(client.locator('.bubble.user')).toHaveCount(0);
+  await client.getByRole('button',{name:'Завершить',exact:true}).click();
+  await operator.getByRole('checkbox',{name:'Доступен для перевода'}).uncheck();
+  await c.close();await o.close();
+ });
+});

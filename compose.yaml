@@ -1,0 +1,62 @@
+name: voice-desk
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: voice
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/setup.py}
+      POSTGRES_DB: voice
+    ports: ["127.0.0.1:15432:5432"]
+    volumes: ["voice-db:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U voice -d voice"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  crm-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: espocrm
+      POSTGRES_PASSWORD: ${CRM_DATABASE_PASSWORD:?Run scripts/setup.py}
+      POSTGRES_DB: espocrm
+    volumes: ["crm-db:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U espocrm -d espocrm"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  crm:
+    image: espocrm/espocrm:10.0.9
+    environment:
+      ESPOCRM_DATABASE_PLATFORM: Postgresql
+      ESPOCRM_DATABASE_HOST: crm-db
+      ESPOCRM_DATABASE_USER: espocrm
+      ESPOCRM_DATABASE_PASSWORD: ${CRM_DATABASE_PASSWORD}
+      ESPOCRM_ADMIN_USERNAME: admin
+      ESPOCRM_ADMIN_PASSWORD: ${CRM_ADMIN_PASSWORD}
+      ESPOCRM_SITE_URL: http://127.0.0.1:18081
+    ports: ["127.0.0.1:18081:80"]
+    volumes:
+      - crm-data:/var/www/html/data
+      - crm-custom:/var/www/html/custom
+      - crm-client:/var/www/html/client/custom
+    depends_on:
+      crm-db: {condition: service_healthy}
+    restart: unless-stopped
+  crm-daemon:
+    image: espocrm/espocrm:10.0.9
+    entrypoint: docker-daemon.sh
+    volumes:
+      - crm-data:/var/www/html/data
+      - crm-custom:/var/www/html/custom
+      - crm-client:/var/www/html/client/custom
+    depends_on: [crm]
+    restart: unless-stopped
+volumes:
+  voice-db:
+  crm-db:
+  crm-data:
+  crm-custom:
+  crm-client:

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f5f4ee"><title>Точка — ваш голосовой помощник</title><link rel="stylesheet" href="/static/style.css"><script type="module" src="/static/client.js?v=20261013-velvet"></script></head>
+<body>
+<header class="site-header"><a class="brand" href="/" aria-label="Точка, главная"><span class="brand-mark"><i></i><i></i><i></i><i></i></span>точка<span class="brand-dot">.</span></a><span class="header-caption">На связи. По делу.</span><a class="quiet-link" href="/operator">Кабинет оператора <span aria-hidden="true">↗</span></a></header>
+<main class="client-main">
+<section class="hero"><div><span class="eyebrow">ВАШ ЛОКАЛЬНЫЙ АССИСТЕНТ</span><h1>Хороший разговор.<br><span>Точная запись.</span></h1></div><p>Расскажите, чем помочь.<br>Мы ответим на вопросы, найдём время<br>и сохраним вашу заявку.</p></section>
+<section class="conversation-layout" aria-label="Разговор с помощником">
+<div class="voice-card"><div class="card-top"><span class="pill"><span class="status-dot" id="health-dot"></span><span id="health-label">Проверяем доступность</span></span><span class="tiny">РУССКИЙ · МИНСК</span></div>
+<div class="mode-tabs" role="tablist" aria-label="Канал разговора"><button id="voice-tab" role="tab" aria-selected="true">Голос</button><button id="chat-tab" role="tab" aria-selected="false">Чат</button></div>
+<div class="voice-profiles" role="group" aria-label="Голос помощника"><button data-voice="male" aria-pressed="true"><strong>Геннадий</strong><span>Мягкий низкий</span></button><button data-voice="female" aria-pressed="false"><strong>Мария</strong><span>Низкий бархатный</span></button></div>
+<button class="text-button" id="preview-voice">Послушать голос</button>
+<div class="orb-wrap" id="orb-wrap"><div class="orb-rings"><div class="orb"><span class="orb-glyph"><i></i><i></i><i></i><i></i><i></i></span></div></div><span class="orb-caption">ПОМОЩНИК ТОЧКИ</span></div>
+<h2 id="call-title">Давайте поговорим</h2><p id="call-description">Один разговор — и вопрос решён.<br>Микрофон включится с вашего разрешения.</p>
+<label class="consent"><input id="consent" type="checkbox"> <span>Согласен на сохранение текста разговора и данных заявки на 30 дней. Аудио не сохраняется.</span></label>
+<button class="primary call-button" id="start-call"><span aria-hidden="true">↗</span> Начать разговор</button>
+<div class="call-controls" id="call-controls" hidden><button class="secondary" id="mute-call">Выключить микрофон</button><button class="danger" id="end-call">Завершить</button></div>
+<button class="secondary" id="resume-audio" hidden>Продолжить звук</button><button class="text-button" id="handoff">Позвать сотрудника</button>
+<div class="voice-bottom"><span class="shield-icon" aria-hidden="true">◈</span> Модели работают на локальном сервере</div>
+</div>
+<div class="dialog-card"><div class="dialog-header"><div><span class="eyebrow">ПРОСТРАНСТВО РАЗГОВОРА</span><h2>Всё важное — здесь</h2></div><button class="icon-button" id="clear-chat" title="Новый разговор" aria-label="Начать новый разговор">↻</button></div>
+<div class="transcript" id="transcript" role="log" aria-live="polite" aria-label="Текст разговора"><div class="welcome-message"><span class="mini-mark">т.</span><p>Здравствуйте! Я виртуальный помощник «Точки».<br>Могу помочь с услугами, записью или вопросом сотруднику.</p><span class="tiny">НАЧНИТЕ С ТОГО, ЧТО ВАМ НУЖНО</span></div></div>
+<div class="quick-prompts" id="quick-prompts"><button data-prompt="Какие услуги у вас есть?">Какие есть услуги?</button><button data-prompt="Хочу записаться на консультацию">Хочу записаться ↗</button></div>
+<form class="composer" id="chat-form"><label class="sr-only" for="message">Ваше сообщение</label><input id="message" autocomplete="off" maxlength="2000" placeholder="Можно просто написать…"><button type="submit" aria-label="Отправить сообщение">↑</button></form><p class="composer-note" id="composer-note">Запись создаётся только после вашего подтверждения</p>
+</div>
+</section>
+<section class="services-section"><div class="section-heading"><h2>Чем можем помочь</h2><button class="text-button" id="callback-open">Оставить вопрос сотруднику ↗</button></div><div id="services" class="service-grid"></div></section>
+<footer class="client-footer"><span>Точка · голос, который помогает</span><a href="/phone">Подключить телефон ↗</a><span>Тестовая компания · вымышленные услуги и адрес</span></footer>
+</main>
+<audio id="remote-audio" autoplay playsinline></audio><audio id="preview-audio" preload="none" playsinline></audio>
+<div id="toast" class="toast" role="status" hidden></div>
+<dialog id="booking-dialog" class="modal"><form id="booking-form"><div class="modal-header"><span class="eyebrow">ЗАПИСЬ НА УСЛУГУ</span><button type="button" class="icon-button" data-close aria-label="Закрыть">×</button></div><h2>Найдём удобное время</h2><label>Услуга<select id="booking-service" required></select></label><div class="form-row"><label>Дата<input id="booking-date" type="date" required></label><label>Свободное время<select id="booking-time" required><option value="">Выберите дату</option></select></label></div><label>Как к вам обращаться<input id="booking-name" autocomplete="given-name" minlength="2" maxlength="100" required placeholder="Ваше имя"></label><label>Телефон<input id="booking-phone" type="tel" autocomplete="tel" required placeholder="+375 29 123 45 67" maxlength="30"></label><p class="form-help">Часовой пояс: Минск (UTC+3). Время фиксируется после подтверждения.</p><button class="primary" type="submit">Проверить и продолжить →</button><p class="form-error" id="booking-error" role="alert"></p></form></dialog>
+<dialog id="callback-dialog" class="modal"><form id="callback-form"><div class="modal-header"><span class="eyebrow">ОБРАТНЫЙ ЗВОНОК</span><button type="button" class="icon-button" data-close aria-label="Закрыть">×</button></div><h2>Передадим ваш вопрос</h2><label>Имя<input name="name" autocomplete="given-name" required minlength="2" maxlength="100"></label><label>Телефон<input name="phone" type="tel" autocomplete="tel" required placeholder="+375 29 123 45 67" maxlength="30"></label><label>Что нужно обсудить?<textarea name="message" rows="3" required minlength="3" maxlength="2000"></textarea></label><button class="primary" type="submit">Проверить и продолжить →</button><p class="form-error" id="callback-error" role="alert"></p></form></dialog>
+</body></html>

@@ -1,0 +1,11 @@
+{
+  "name": "voice-desk-ui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "check": "node --check app/static/client.js && node --check app/static/operator.js && node --check app/static/shared.js && node --check app/static/manage.js"
+  },
+  "devDependencies": {"@playwright/test": "^1.56.0", "agent-browser": "^0.21.0"}
+}
