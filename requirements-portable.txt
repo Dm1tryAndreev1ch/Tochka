@@ -17,3 +17,4 @@ python-dotenv==1.2.4
 cryptography==50.0.2
 tzdata>=2025.2
 # Optional Telegram calls need additional platform-compatible py-tgcalls/telethon.
+scipy==1.18.1

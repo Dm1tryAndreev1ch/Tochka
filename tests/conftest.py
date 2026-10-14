@@ -56,6 +56,8 @@ async def database_admin(database_testbed):
 @pytest_asyncio.fixture
 async def business(tmp_path, monkeypatch, database_testbed):
     monkeypatch.setattr(settings, "private_runtime_dir", str(tmp_path))
+    # CRM tests must not depend on a developer-local .env.
+    monkeypatch.setattr(settings, "espo_api_key", settings.espo_api_key or "test-espo-key")
     pool = await db.connect(database_testbed["runtime_url"])
     try:
         yield Business(pool)

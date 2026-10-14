@@ -68,17 +68,18 @@ async def _assert_role_policy(conn, role):
         SELECT EXISTS(SELECT 1 FROM pg_catalog.pg_class c
           JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
           WHERE n.nspname='public' AND c.relkind IN ('r','p','v','m','f')
-          AND (pg_catalog.has_table_privilege($1::oid,c.oid,'TRUNCATE,TRIGGER,REFERENCES')
+          AND CASE WHEN c.relkind IN ('r','p','v','m','f') THEN (pg_catalog.has_table_privilege($1::oid,c.oid,'TRUNCATE,TRIGGER,REFERENCES')
             OR (c.relname='audit' AND (pg_catalog.has_table_privilege($1,c.oid,'UPDATE,DELETE')
                 OR pg_catalog.has_any_column_privilege($1,c.oid,'UPDATE')))
             OR (c.relname='schema_migrations' AND (pg_catalog.has_table_privilege($1,c.oid,'INSERT,UPDATE,DELETE')
                 OR pg_catalog.has_any_column_privilege($1,c.oid,'INSERT,UPDATE')))
             OR pg_catalog.has_table_privilege($1,c.oid,
-                'SELECT WITH GRANT OPTION,INSERT WITH GRANT OPTION,UPDATE WITH GRANT OPTION,DELETE WITH GRANT OPTION')))
+                'SELECT WITH GRANT OPTION,INSERT WITH GRANT OPTION,UPDATE WITH GRANT OPTION,DELETE WITH GRANT OPTION'))
+            ELSE false END)
         OR EXISTS(SELECT 1 FROM pg_catalog.pg_class c
           JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
           WHERE n.nspname='public' AND c.relkind='S'
-          AND pg_catalog.has_sequence_privilege($1,c.oid,'UPDATE'))
+          AND CASE WHEN c.relkind='S' THEN pg_catalog.has_sequence_privilege($1,c.oid,'UPDATE') ELSE false END)
     """, oid):
         raise DatabaseSecurityError("Runtime database role has unsafe table, audit, migration or sequence privileges")
 

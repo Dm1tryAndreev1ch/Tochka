@@ -193,9 +193,10 @@ async def publish(business, content, *, published=None):
     return kid
 
 
-async def test_faq_reads_published_revision_and_current_updates_without_model(business, session):
+async def test_faq_reads_published_revision_and_current_updates_without_model(business, session, database_admin):
     sid, model = session["uuid"], CountingModel()
-    await business.pool.execute("DELETE FROM knowledge")
+    # The runtime role has no DELETE on knowledge by design; clean up as the DB owner.
+    await database_admin.execute("DELETE FROM knowledge")
     kid = await publish(business, "Адрес: неопубликованный секрет.", published="Адрес: улица Первая, 10.")
     dialogue = Dialogue(business, model, EventBus())
     assert await dialogue.prepare(sid, "Какой адрес компании?") is None
@@ -210,9 +211,10 @@ async def test_faq_reads_published_revision_and_current_updates_without_model(bu
     assert model.calls == []
 
 
-async def test_source_scope_price_and_schedule_are_current(business, session):
+async def test_source_scope_price_and_schedule_are_current(business, session, database_admin):
     sid, model = session["uuid"], CountingModel()
-    await business.pool.execute("DELETE FROM knowledge")
+    # The runtime role has no DELETE on knowledge by design; clean up as the DB owner.
+    await database_admin.execute("DELETE FROM knowledge")
     allowed = await publish(business, "Телефон: +375290001234.")
     await publish(business, "Адрес: закрытый источник.")
     await business.pool.execute("UPDATE sessions SET agent_config=$2 WHERE id=$1", sid, {"knowledge_ids": [str(allowed)]})
