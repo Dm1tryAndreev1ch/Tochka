@@ -22,6 +22,7 @@ from app.archive_api import Purpose, archive_entry, archive_router
 from app.background import run_background
 from app.business import Business, json_record, token_hash
 from app.call_modes import CallModes
+from app.company_faq import PROJECT_FACTS
 from app.config import ROOT, settings
 from app.dialogue import Dialogue, EventBus
 from app.errors import AppError
@@ -139,6 +140,20 @@ async def lifespan(app):
                 "О тестовой компании",
                 "Точка — вымышленная компания для проверки приложения. Адрес для тестов: Минск, улица Примерная, 10. Оплата на месте, белорусские рубли. Услуги: консультация, диагностика и настройка. Рабочие часы задаются в расписании. Не выдавайте эти данные за сведения реального бизнеса.",
                 "Тестовые данные",
+            )
+    # Beta sign-up goal: seed the service and project facts once; owner edits win.
+    async with app.state.pool.acquire() as conn:
+        await conn.execute(
+            "INSERT INTO services(id,name,description,price,duration) VALUES('beta-test','Бета-тест Точки',$1,0,30) ON CONFLICT DO NOTHING",
+            "Запись на бета-тест виртуального администратора Точка. Условия участия уточняет сотрудник.",
+        )
+        if not await conn.fetchval("SELECT EXISTS(SELECT 1 FROM knowledge WHERE title=$1)", "О проекте Точка и бета-тесте"):
+            await conn.execute(
+                "INSERT INTO knowledge(id,title,content,source,published_revision,published_content,published_title) VALUES($1,$2,$3,$4,1,$3,$2)",
+                uuid4(),
+                "О проекте Точка и бета-тесте",
+                PROJECT_FACTS,
+                "Описание проекта",
             )
     yield
     if app.state.socket_calls:

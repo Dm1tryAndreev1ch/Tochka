@@ -743,7 +743,7 @@ class DialogueProcessor(FrameProcessor):
                 )
                 runtime["cacheable_text"] = (
                     reply["text"]
-                    if reply.get("response_source") in {"knowledge", "missing_fact"}
+                    if reply.get("response_source") in {"knowledge", "missing_fact", "company_faq"}
                     or ("collected" in reply and reply["text"] in PUBLIC_CLARIFICATIONS)
                     else None
                 )
@@ -826,7 +826,7 @@ class VoiceManager:
             runtime["notice_delivered"] = False
 
         else:
-            greeting += "Чем могу помочь?"
+            greeting += "Расскажу о проекте Точка и могу записать вас на бета-тест. Чем могу помочь?"
         runtime["cacheable_text"] = greeting
         await runtime["worker"].queue_frame(TTSSpeakFrame(greeting))
 

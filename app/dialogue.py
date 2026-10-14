@@ -8,6 +8,7 @@ from datetime import datetime
 from pydantic import ValidationError
 
 from app.business import MINSK
+from app.company_faq import company_reply, company_topic
 from app.errors import AppError
 from app.fast_intents import (
     control_request,
@@ -182,7 +183,8 @@ class Dialogue:
         if (
             control_request(text, session["context"], has_draft=bool(draft))
             or (use_fast_rules and (
-                social_reply(text) is not None
+                company_topic(text) is not None
+                or social_reply(text) is not None
                 or fast_faq_reply(text, services, knowledge) is not None
                 or faq_topic(text) in {"hours", "weekends"}
                 or requested_slots(text, session["context"], services, datetime.now(MINSK)) is not None
@@ -322,6 +324,8 @@ class Dialogue:
         if not compound and re.search(r"(?:как меня зовут|как зовут меня|помнишь.{0,15}(?:имя|зовут)|как ко мне обращаться)", normalized):
             name = (memory or {}).get("customer_name")
             return {"text": f"Вас зовут {name}." if name else "Вы ещё не назвали своё имя. Как к вам обращаться?", "response_source": "session_memory"}
+        if use_fast_rules and not compound and (reply := company_reply(text, allowed_actions=actions)):
+            return reply
         if use_fast_rules and not compound and (reply := social_reply(
             text,
             assistant_name=agent_config.get("name") or ("Мария" if voice_profile == "female" else "Геннадий"),

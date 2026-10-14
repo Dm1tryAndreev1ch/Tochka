@@ -77,7 +77,7 @@ class Business:
             "expires_at": expires.isoformat(),
             "voice_profile": voice_profile,
             "policy": policy,
-            "greeting": f"Здравствуйте! Меня зовут {agent['name']}. Я виртуальный помощник компании {policy['company_name']}. Чем могу помочь?",
+            "greeting": f"Здравствуйте! Меня зовут {agent['name']}. Я виртуальный помощник компании {policy['company_name']}. Расскажу о проекте и могу записать вас на бета-тест. Чем могу помочь?",
         }
 
     async def session(self, sid, token):
