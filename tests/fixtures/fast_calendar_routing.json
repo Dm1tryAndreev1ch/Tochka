@@ -1,0 +1,249 @@
+{
+  "description": "Independent explicit calendar gold fixture frozen before calendar implementation. Regression evidence; not a blind traffic benchmark. No-year dates require caller-supplied horizon; runtime default excludes them.",
+  "cases": [
+    {
+      "id": "calendar_01",
+      "text": "16 октября 2026",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": "2026-10-16"
+    },
+    {
+      "id": "calendar_02",
+      "text": "На 1 ноября 2026 года",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": "2026-11-01"
+    },
+    {
+      "id": "calendar_03",
+      "text": "31 декабря 2026",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": "2026-12-31"
+    },
+    {
+      "id": "calendar_04",
+      "text": "1 января 2027",
+      "now": "2026-12-31T12:00:00+03:00",
+      "expected_date": "2027-01-01"
+    },
+    {
+      "id": "calendar_05",
+      "text": "29 февраля 2028",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": "2028-02-29"
+    },
+    {
+      "id": "calendar_06",
+      "text": "29 февраля 2027",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_07",
+      "text": "31 апреля 2027",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_08",
+      "text": "15 октября 2025",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": "2025-10-15"
+    },
+    {
+      "id": "calendar_09",
+      "text": "2026-10-16",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": "2026-10-16"
+    },
+    {
+      "id": "calendar_10",
+      "text": "На 2027-01-01",
+      "now": "2026-12-31T12:00:00+03:00",
+      "expected_date": "2027-01-01"
+    },
+    {
+      "id": "calendar_11",
+      "text": "2026-02-30",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_12",
+      "text": "16.10.2026",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": "2026-10-16"
+    },
+    {
+      "id": "calendar_13",
+      "text": "1.2.2027",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": "2027-02-01"
+    },
+    {
+      "id": "calendar_14",
+      "text": "16.10.26",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_15",
+      "text": "16 октября",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_16",
+      "text": "12 октября",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_17",
+      "text": "1 января",
+      "now": "2026-12-31T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_18",
+      "text": "В эту пятницу",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": "2026-10-16"
+    },
+    {
+      "id": "calendar_19",
+      "text": "В эту среду",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": "2026-10-14"
+    },
+    {
+      "id": "calendar_20",
+      "text": "В пятницу",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": "2026-10-16"
+    },
+    {
+      "id": "calendar_21",
+      "text": "В следующий понедельник",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_22",
+      "text": "В понедельник",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_23",
+      "text": "Во вторник",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_24",
+      "text": "Каждую пятницу",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_25",
+      "text": "По пятницам",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_26",
+      "text": "Не в пятницу",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_27",
+      "text": "В пятницу или субботу",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_28",
+      "text": "16 октября 2026 или 17 октября 2026",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_29",
+      "text": "Завтра 16 октября 2026",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_30",
+      "text": "После 16 октября 2026",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_31",
+      "text": "Спустя неделю",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_32",
+      "text": "Четырнадцатого",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_33",
+      "text": "В ближайшую субботу",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": "2026-10-17"
+    },
+    {
+      "id": "calendar_34",
+      "text": "В эту пятницу",
+      "now": "2026-10-17T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_35",
+      "text": "В воскресенье",
+      "now": "2026-10-18T12:00:00+03:00",
+      "expected_date": null
+    },
+    {
+      "id": "calendar_36",
+      "text": "В эту пятницу в 11:00",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": "2026-10-16"
+    },
+    {
+      "id": "calendar_37",
+      "text": "16 октября",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": "2026-10-16",
+      "booking_horizon_days": 30
+    },
+    {
+      "id": "calendar_38",
+      "text": "16 ноября",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null,
+      "booking_horizon_days": 30
+    },
+    {
+      "id": "calendar_39",
+      "text": "13 октября",
+      "now": "2026-10-13T12:00:00+03:00",
+      "expected_date": null,
+      "booking_horizon_days": 30
+    },
+    {
+      "id": "calendar_40",
+      "text": "1 января",
+      "now": "2026-12-31T12:00:00+03:00",
+      "expected_date": null,
+      "booking_horizon_days": 30
+    }
+  ]
+}

@@ -196,8 +196,8 @@ class SocketCalls:
             raise AppError("voice_unavailable", "Голос Марии пока недоступен", 503)
         async with self.registration_lock:
             await self.purge()
-            if self.voice.active or self.pending:
-                raise AppError("voice_busy", "Помощник занят. Попробуйте позже", 409)
+            if len(self.pending) + len(self.voice.runtime) >= settings.call_queue_capacity + 1:
+                raise AppError("call_queue_full", "Очередь заполнена. Попробуйте позже", 429)
             session = await self.business.new_transport_session(source, profile)
             sid = UUID(session["id"])
             self.pending[sid] = {"source": source, "profile": profile, "expires": time.monotonic() + 30}

@@ -1,16 +1,16 @@
 from types import SimpleNamespace
-from uuid import uuid4
 
-import asyncpg
 import httpx
 import pytest_asyncio
 
 from app import db
+from app.archive import ConversationArchive
 from app.business import Business
 from app.config import settings
 from app.dialogue import Dialogue, EventBus
 from app.main import app, rate_buckets
 from app.schemas import ExtractedIntent
+from scripts.database_testbed import isolated_database
 
 
 class FakeModels:
@@ -43,17 +43,24 @@ class FakeVoice:
 
 
 @pytest_asyncio.fixture
-async def business():
-    database = "voice_test_" + uuid4().hex[:12]
-    connection = await asyncpg.connect(settings.database_url)
-    await connection.execute(f'CREATE DATABASE "{database}"')
-    pool = await db.connect(settings.database_url.rsplit("/", 1)[0] + "/" + database)
+async def database_testbed():
+    async with isolated_database() as testbed:
+        yield testbed
+
+
+@pytest_asyncio.fixture
+async def database_admin(database_testbed):
+    return database_testbed["admin"]
+
+
+@pytest_asyncio.fixture
+async def business(tmp_path, monkeypatch, database_testbed):
+    monkeypatch.setattr(settings, "private_runtime_dir", str(tmp_path))
+    pool = await db.connect(database_testbed["runtime_url"])
     try:
         yield Business(pool)
     finally:
         await pool.close()
-        await connection.execute(f'DROP DATABASE "{database}" WITH (FORCE)')
-        await connection.close()
 
 
 @pytest_asyncio.fixture
@@ -66,6 +73,7 @@ async def client(business):
     app.state.voice = FakeVoice()
     app.state.dialogue = Dialogue(business, app.state.models, events)
     app.state.crm = SimpleNamespace(last_ok=None)
+    app.state.archive = ConversationArchive(business.pool)
     rate_buckets.clear()
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app), base_url="http://localhost"

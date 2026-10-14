@@ -4,6 +4,7 @@ from datetime import UTC, datetime, timedelta
 
 import httpx
 
+from app.background import run_background
 from app.config import settings
 
 log = logging.getLogger("voice.crm")
@@ -20,6 +21,7 @@ class CRMWorker:
         )
         self.stop = asyncio.Event()
         self.last_ok = None
+        self.status = {}
 
     async def sync_one(self):
         if not settings.espo_api_key:
@@ -33,6 +35,7 @@ class CRMWorker:
             )
             if not event:
                 return False
+            await conn.execute("UPDATE outbox SET last_attempt_at=now() WHERE id=$1", event["id"])
             try:
                 payload = dict(event["payload"])
                 if settings.espo_assigned_user_id:
@@ -70,7 +73,7 @@ class CRMWorker:
                 response.raise_for_status()
                 external_id = response.json()["id"]
                 await conn.execute(
-                    "UPDATE outbox SET status='synced',external_id=$2,error=NULL,attempts=attempts+1 WHERE id=$1",
+                    "UPDATE outbox SET status='synced',external_id=$2,error=NULL,attempts=attempts+1,synced_at=now() WHERE id=$1",
                     event["id"],
                     external_id,
                 )
@@ -94,17 +97,7 @@ class CRMWorker:
             return True
 
     async def run(self):
-        while not self.stop.is_set():
-            try:
-                worked = await self.sync_one()
-                if worked:
-                    continue
-            except Exception:
-                log.exception("crm_worker_failure")
-            try:
-                await asyncio.wait_for(self.stop.wait(), timeout=2)
-            except TimeoutError:
-                pass
+        await run_background("crm", self.sync_one, interval=2, stop=self.stop, status=self.status)
 
     async def close(self):
         self.stop.set()

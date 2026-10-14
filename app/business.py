@@ -10,6 +10,7 @@ import asyncpg
 from app.config import settings
 from app.db import audit
 from app.errors import AppError
+from app.policy import current_policy
 from app.schemas import BookingDraft, CallbackDraft
 
 MINSK = ZoneInfo("Europe/Minsk")
@@ -41,7 +42,7 @@ class Business:
         self.pool = pool
 
     async def new_session(self, channel, consent, voice_profile="male"):
-        if not consent:
+        if not consent and channel != "voice":
             raise AppError("consent_required", "Для разговора нужно согласие на сохранение обращения", 422)
         return await self._create_session(channel, consent, voice_profile, "website")
 
@@ -53,8 +54,12 @@ class Business:
     async def _create_session(self, channel, consent, voice_profile, source):
         sid, token = uuid4(), secrets.token_urlsafe(32)
         expires = datetime.now(UTC) + timedelta(seconds=settings.session_ttl_seconds)
+        policy = await current_policy(self.pool)
+        agent = await self.pool.fetchrow("SELECT profile,name,instructions,knowledge_ids,allowed_actions,category_schema,revision FROM agents WHERE profile=$1", voice_profile)
+        agent_config = dict(agent)
+        agent_config["company_name"] = policy["company_name"]
         await self.pool.execute(
-            "INSERT INTO sessions(id,token_hash,channel,expires_at,consent,voice_profile,source) VALUES($1,$2,$3,$4,$5,$6,$7)",
+            "INSERT INTO sessions(id,token_hash,channel,expires_at,consent,voice_profile,source,policy,agent_config,consent_at,consent_method) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,CASE WHEN $5 THEN now() ELSE NULL END,CASE WHEN $5 THEN 'checkbox' ELSE NULL END)",
             sid,
             token_hash(token),
             channel,
@@ -62,13 +67,17 @@ class Business:
             consent,
             voice_profile,
             source,
+            policy,
+            agent_config,
         )
+        await self.pool.execute("INSERT INTO session_usage(session_id) VALUES($1)", sid)
         return {
             "id": str(sid),
             "token": token,
             "expires_at": expires.isoformat(),
             "voice_profile": voice_profile,
-            "greeting": "Здравствуйте! Я виртуальный помощник тестовой компании «Точка». Могу рассказать об услугах, записать вас или передать вопрос сотруднику. Чем помочь?",
+            "policy": policy,
+            "greeting": f"Здравствуйте! Меня зовут {agent['name']}. Я виртуальный помощник компании {policy['company_name']}. Чем могу помочь?",
         }
 
     async def session(self, sid, token):
@@ -80,6 +89,24 @@ class Business:
         if not row:
             raise AppError("session_expired", "Сессия завершена. Начните новый разговор", 401)
         return dict(row)
+
+    async def request_handoff(self, sid):
+        async with self.pool.acquire() as conn, conn.transaction():
+            row = await conn.fetchrow("SELECT * FROM sessions WHERE id=$1 FOR UPDATE", sid)
+            if not row or row["ended_at"] or row["expires_at"] <= datetime.now(UTC) or row.get("data_erased"):
+                raise AppError("session_expired", "Разговор завершён", 401)
+            self.require_allowed_action(row, "handoff")
+            if row["state"] == "human":
+                return {"status": "human", "message": "Сотрудник уже на связи."}
+            if row["state"] == "queued":
+                return {"status": "queued", "message": "Вы ожидаете подключения. Запрос сотрудника будет доступен после выхода из очереди."}
+            if row["state"] == "handoff_pending":
+                return {"status": "pending", "message": "Сотрудник уже приглашён. Пожалуйста, подождите."}
+            operator = await conn.fetchval("SELECT value FROM settings WHERE key='operator'")
+            if not operator or not operator.get("available"):
+                return {"status": "unavailable", "message": "Сотрудник сейчас недоступен. Могу сохранить заявку на обратный звонок."}
+            await conn.execute("UPDATE sessions SET state='handoff_pending' WHERE id=$1", sid)
+            return {"status": "pending", "message": "Приглашаю сотрудника. Пожалуйста, подождите до тридцати секунд."}
 
     async def services(self):
         return [
@@ -146,8 +173,8 @@ class Business:
         payload = data.model_dump(mode="json")
         async with self.pool.acquire() as conn, conn.transaction():
             session = await conn.fetchrow("SELECT * FROM sessions WHERE id=$1 FOR UPDATE", sid)
-            if not session or session["ended_at"] or session["expires_at"] <= datetime.now(UTC):
-                raise AppError("session_expired", "Сессия завершена", 401)
+            self.require_customer_action(session)
+            self.require_allowed_action(session, kind)
             if kind == "booking":
                 service = await conn.fetchrow(
                     "SELECT * FROM services WHERE id=$1 AND active FOR SHARE", data.service_id
@@ -223,18 +250,19 @@ class Business:
             async with self.pool.acquire() as conn, conn.transaction():
                 # A per-session lock serializes HTTP, chat and voice confirmations.
                 session = await conn.fetchrow("SELECT * FROM sessions WHERE id=$1 FOR UPDATE", sid)
-                if not session or session["ended_at"] or session["expires_at"] <= datetime.now(UTC):
-                    raise AppError("session_expired", "Сессия завершена", 401)
+                self.require_customer_action(session)
                 old = await conn.fetchrow("SELECT * FROM actions WHERE idempotency_key=$1", key)
                 if old:
                     if old["session_id"] != sid or old["draft_id"] != did:
                         raise AppError("idempotency_conflict", "Ключ запроса уже использован", 409)
+                    self.require_allowed_action(session, old["kind"])
                     return self.action_result(old)
                 draft = await conn.fetchrow(
                     "SELECT * FROM drafts WHERE id=$1 AND session_id=$2 FOR UPDATE", did, sid
                 )
                 if not draft:
                     raise AppError("draft_not_found", "Подтверждение не найдено", 404)
+                self.require_allowed_action(session, draft["kind"])
                 committed = await conn.fetchrow(
                     "SELECT * FROM actions WHERE draft_id=$1 AND session_id=$2", did, sid
                 )
@@ -264,6 +292,8 @@ class Business:
                         )
                     starts = datetime.fromisoformat(payload["starts_at"])
                     ends = await self.validate_time(starts, payload["duration"], conn)
+                    # Serialize mutations of the shared "main" resource before GiST exclusion checks.
+                    await conn.execute("SELECT pg_advisory_xact_lock(7860005)")
                     result.update(
                         booking_id=str(rid),
                         starts_at=starts.isoformat(),
@@ -368,6 +398,23 @@ class Business:
             raise AppError("idempotency_conflict", "Ключ запроса уже использован", 409) from None
 
     @staticmethod
+    def require_customer_action(session, *, allow_human=False):
+        if not session or session["ended_at"] or session["expires_at"] <= datetime.now(UTC) or session.get("data_erased"):
+            raise AppError("session_expired", "Сессия завершена", 401)
+        if session["state"] == "queued":
+            raise AppError("call_queued", "Вы в очереди. Дождитесь подключения помощника", 409)
+        if not session["consent"]:
+            raise AppError("consent_required", "Сначала нужно согласие на сохранение обращения", 422)
+        if session["state"] == "human" and not allow_human:
+            raise AppError("human_active", "Разговор передан сотруднику", 409)
+
+    @staticmethod
+    def require_allowed_action(session, kind):
+        actions = (session.get("agent_config") or {}).get("allowed_actions", ["booking", "callback", "handoff"])
+        if kind not in actions:
+            raise AppError("action_disabled", "Это действие выключено в настройках помощника", 403)
+
+    @staticmethod
     def action_result(action):
         result = dict(action["result"])
         if not result or result.get("deleted"):
@@ -423,6 +470,7 @@ class Business:
             return {"status": "needs_confirmation", "summary": summary, "revision": data.revision}
         try:
             async with self.pool.acquire() as conn, conn.transaction():
+                await conn.execute("SELECT pg_advisory_xact_lock(7860005)")
                 row = await conn.fetchrow(
                     "SELECT * FROM bookings WHERE id=$1 AND token_hash=$2 AND token_expires_at>now() FOR UPDATE",
                     UUID(booking["id"]),

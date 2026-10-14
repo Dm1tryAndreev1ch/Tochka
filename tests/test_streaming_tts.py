@@ -1,3 +1,5 @@
+import asyncio
+import time
 from types import SimpleNamespace
 
 import httpx
@@ -48,6 +50,36 @@ async def test_female_failure_does_not_silently_change_to_male(monkeypatch):
     try:
         with pytest.raises(AppError, match="Женский голос"):
             _ = [chunk async for chunk in model.stream_speech("Здравствуйте", "female")]
+    finally:
+        await model.close()
+
+
+async def test_warm_speech_does_not_wait_for_a_stalled_health_probe(monkeypatch):
+    monkeypatch.setattr(settings, "natural_tts_enabled", True)
+    waiting = asyncio.Event()
+    release = asyncio.Event()
+
+    async def handler(request):
+        if request.url.path == "/health":
+            waiting.set()
+            await release.wait()
+            return httpx.Response(200, json={"ready": True, "voice": "serena"})
+        return httpx.Response(
+            200, stream=BytesStream(), headers={"X-Audio-Sample-Rate": "24000", "X-Audio-Format": "pcm_s16le"}
+        )
+
+    model = LocalModels()
+    model.ready = True
+    model.natural_status = {"natural_ready": True, "backend": "qwen3-tts-mlx", "ready": True}
+    model._natural_checked = time.monotonic() - 10
+    await model.natural_http.aclose()
+    model.natural_http = httpx.AsyncClient(base_url="http://tts", transport=httpx.MockTransport(handler))
+    try:
+        async with asyncio.timeout(1):
+            audio = b"".join([chunk async for chunk in model.stream_speech("Здравствуйте", "female")])
+            await waiting.wait()
+        assert audio == b"\x01\x00\x02\x00"
+        assert not release.is_set()
     finally:
         await model.close()
 

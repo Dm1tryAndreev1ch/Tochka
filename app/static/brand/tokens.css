@@ -1,0 +1,13 @@
+/* Точка: shared design tokens. See docs/design/DESIGN_SYSTEM.md. */
+@font-face{font-family:'Golos';src:url('/static/golos.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
+:root{
+  --parchment:#f2f0f4;--white:#ffffff;--ink:#17121d;--charcoal:#221d29;
+  --aub:#2f2838;--ash:#b9b4c2;--dim:#656170;--bone:#d9d5de;
+  --success:#3d654c;--success-bg:#edf3ee;--warning:#80551d;--warning-bg:#fbf3e5;
+  --error:#9b3d49;--error-bg:#fbeced;
+  --font:'Golos',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --radius:6px;--radius-lg:10px;--radius-pill:999px;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;
+  --space-6:24px;--space-8:32px;--space-12:48px;--space-16:64px;--space-24:96px;
+  --content-width:1200px;--motion:160ms ease;--sidebar-width:248px;
+}

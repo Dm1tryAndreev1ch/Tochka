@@ -1,0 +1,5 @@
+Tool: built-in image_gen (transparent_background=true)
+Reference: app/static/brand/phone-wave-v2.png
+Output: app/static/brand/phone-clean-v3.png
+
+Edit the reference to isolate ONLY the central smartphone. Preserve its exact silhouette, clockwise tilt, perspective, thin muted aubergine contour lines, earpiece, side button and small circular handset icon. REMOVE entirely the large sweeping wave wings outside the phone and the waveform inside the screen. Remove all haze, glow, fuzzy filaments and shadows. The phone will be composited with an existing clean SVG wave in a website. Output a single clean isolated wire-contour smartphone, with real transparent alpha around it and a completely transparent screen interior except the handset icon. Refine its contours into a small number of crisp smooth evenly spaced hairlines, minimalist editorial style, in muted aubergine #2f2838 and gray #656170. No new objects, no text, no extra outer frame, no background, no floor, no card. Portrait canvas tightly fitted around the complete tilted phone with 8% transparent padding. Preserve actual transparency, no white or black backdrop.

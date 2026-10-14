@@ -1,6 +1,49 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Точка — кабинет оператора</title><link rel="stylesheet" href="/static/style.css"><script type="module" src="/static/operator.js"></script></head><body>
-<div id="login-page" class="login-page"><form id="login-form" class="login-card"><a href="/" class="brand"><span class="brand-mark"><i></i><i></i><i></i><i></i></span>точка<span class="brand-dot">.</span></a><span class="eyebrow">РАБОЧЕЕ ПРОСТРАНСТВО</span><h1>Рады видеть вас</h1><p>Обращения, записи и знания компании — в одном месте.</p><label for="login-role">Роль</label><select id="login-role"><option value="admin">Администратор</option><option value="operator">Оператор</option></select><label for="login-password">Пароль</label><input id="login-password" type="password" autocomplete="current-password" required><button class="primary" type="submit">Войти в кабинет →</button><div class="form-error" id="login-error" role="alert"></div><a href="/">← Страница голосового помощника</a></form></div>
-<div id="desk" class="desk" hidden><aside class="sidebar"><a class="brand" href="/"><span class="brand-mark"><i></i><i></i><i></i><i></i></span>точка<span class="brand-dot">.</span></a><span class="sidebar-caption">КАБИНЕТ КОМПАНИИ</span><nav aria-label="Разделы кабинета"><button class="nav-button active" data-view="overview"><span class="nav-icon" aria-hidden="true">◫</span>Обзор</button><button class="nav-button" data-view="requests"><span class="nav-icon" aria-hidden="true">↙</span>Обращения</button><button class="nav-button" data-view="calendar"><span class="nav-icon" aria-hidden="true">▦</span>Расписание</button><button class="nav-button" data-view="sessions"><span class="nav-icon" aria-hidden="true">≋</span>Разговоры</button><button class="nav-button" data-view="knowledge"><span class="nav-icon" aria-hidden="true">▤</span>База знаний</button><button class="nav-button" data-view="services"><span class="nav-icon" aria-hidden="true">◇</span>Услуги</button><button class="nav-button" data-view="channels"><span class="nav-icon" aria-hidden="true">◉</span>Каналы звонков</button><button class="nav-button" data-view="system"><span class="nav-icon" aria-hidden="true">⌘</span>Система</button></nav><div class="sidebar-bottom"><a href="/" target="_blank" rel="noopener">Открыть голосовую страницу ↗</a><button id="logout">Выйти из кабинета</button></div></aside>
-<main class="desk-content"><header class="desk-header"><span class="tiny">ТОЧКА / <span id="breadcrumb">ОБЗОР</span></span><label class="availability-toggle"><span id="availability-label">Недоступен для перевода</span><input id="availability" type="checkbox" aria-label="Доступен для перевода"></label><span class="health-chip" id="system-state">Проверяем систему</span><button class="text-button mobile-logout" id="mobile-logout">Выйти</button></header><section id="view-content" aria-live="polite"></section></main></div>
-<dialog id="editor-dialog" class="modal"><div class="modal-header"><span class="eyebrow" id="editor-kind">РЕДАКТИРОВАНИЕ</span><button class="icon-button" data-close aria-label="Закрыть">×</button></div><div id="editor-content"></div></dialog>
-<dialog id="request-dialog" class="modal"><div class="modal-header"><span class="eyebrow">ОБРАЩЕНИЕ</span><button class="icon-button" data-close aria-label="Закрыть">×</button></div><div id="request-content"></div></dialog><div id="toast" class="toast" role="status" hidden></div><audio id="operator-audio" autoplay></audio></body></html>
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2f2838">
+<title>Точка — кабинет компании</title>
+<link rel="stylesheet" href="/static/brand/tokens.css">
+<link rel="stylesheet" href="/static/brand/components.css">
+<link rel="stylesheet" href="/static/operator.css">
+<script type="module" src="/static/operator.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#view-content">Перейти к рабочей области</a>
+<div id="login-page" class="login-page">
+  <section class="login-intro" aria-label="Точка — рабочее пространство">
+    <a href="/landing" class="logo logo--light"><img src="/static/brand/tochka-light.svg" width="220" height="39" alt="Точка"></a>
+    <div><p class="eyebrow">Каждый разговор имеет значение</p><h2>Ближе к клиентам.<br>Спокойнее за работу.</h2><p>Обращения, диалоги и знания компании.<br>Всё, что нужно вашей команде, — рядом.</p></div>
+    <p class="login-caption">Кабинет компании / Точка</p>
+  </section>
+  <div class="login-form-wrap"><form id="login-form" class="login-card">
+    <span class="eyebrow">Рабочее пространство</span><h1>С возвращением</h1><p>Войдите в кабинет своей компании.</p>
+    <label for="login-role">Учётная запись</label><select id="login-role"><option value="admin">Администратор</option><option value="operator">Оператор</option><option value="custom">Другой сотрудник</option></select>
+    <div id="username-field" hidden><label for="login-username">Логин</label><input id="login-username" autocomplete="username" maxlength="60" pattern="[A-Za-z0-9_.-]{2,60}" placeholder="Ваш логин"></div>
+    <label for="login-password">Пароль</label><input id="login-password" type="password" autocomplete="current-password" required maxlength="200">
+    <button class="primary" type="submit">Войти в кабинет →</button><div class="form-error" id="login-error" role="alert"></div>
+    <a class="login-back" href="/landing">← На сайт Точки</a>
+  </form></div>
+</div>
+<div id="desk" class="desk" hidden>
+  <aside class="sidebar">
+    <div class="sidebar-brand"><a class="logo logo--light" href="/landing"><img src="/static/brand/tochka-light.svg" width="180" height="32" alt="Точка"></a><button class="icon-button menu-toggle" id="menu-toggle" aria-label="Открыть меню" aria-expanded="false" aria-controls="workspace-nav">☰</button></div>
+    <div class="workspace-label"><span class="workspace-avatar" aria-hidden="true">Т</span><div><strong id="company-name">Кабинет компании</strong><span id="account-role">Рабочее пространство</span></div></div>
+    <nav id="workspace-nav" aria-label="Разделы кабинета"><div class="nav-group"><p class="nav-group-label">Работа</p><button class="nav-button" data-view="overview"><span class="nav-icon" aria-hidden="true">▦</span><span>Обзор</span></button><button class="nav-button" data-view="requests"><span class="nav-icon" aria-hidden="true">↙</span><span>Обращения</span></button><button class="nav-button" data-view="calendar"><span class="nav-icon" aria-hidden="true">▤</span><span>Расписание</span></button><button class="nav-button" data-view="sessions"><span class="nav-icon" aria-hidden="true">≋</span><span>Разговоры</span></button></div>
+<div class="nav-group"><p class="nav-group-label">Управление</p><button class="nav-button" data-view="agents"><span class="nav-icon" aria-hidden="true">◉</span><span>Агенты</span></button><button class="nav-button" data-view="knowledge"><span class="nav-icon" aria-hidden="true">▧</span><span>База знаний</span></button><button class="nav-button" data-view="services"><span class="nav-icon" aria-hidden="true">◇</span><span>Услуги</span></button><button class="nav-button" data-view="channels"><span class="nav-icon" aria-hidden="true">↗</span><span>Каналы звонков</span></button></div>
+<div class="nav-group"><p class="nav-group-label">Компания</p><button class="nav-button" data-view="company"><span class="nav-icon" aria-hidden="true">□</span><span>Компания</span></button><button class="nav-button" data-view="staff"><span class="nav-icon" aria-hidden="true">⊙</span><span>Сотрудники</span></button><button class="nav-button" data-view="usage"><span class="nav-icon" aria-hidden="true">▥</span><span>Аналитика</span></button><button class="nav-button" data-view="archive"><span class="nav-icon" aria-hidden="true">▤</span><span>Архив</span></button><button class="nav-button" data-view="crm"><span class="nav-icon" aria-hidden="true">↗</span><span>Отправления CRM</span></button><button class="nav-button" data-view="audit"><span class="nav-icon" aria-hidden="true">≋</span><span>Аудит</span></button><button class="nav-button" data-view="system"><span class="nav-icon" aria-hidden="true">⌘</span><span>Система и CRM</span></button></div></nav>
+    <div class="sidebar-bottom"><a href="/" target="_blank" rel="noopener">Проверить помощника <span aria-hidden="true">↗</span></a><button id="logout">Выйти из кабинета <span aria-hidden="true">↗</span></button></div>
+  </aside>
+  <main class="desk-content">
+    <header class="desk-header"><div class="breadcrumb">Рабочее пространство <span aria-hidden="true">/</span> <strong id="breadcrumb">Обзор</strong></div><div class="header-tools"><span class="health-chip" id="system-state" data-state="loading">Проверяем систему</span><button class="text-button" id="refresh-view" aria-label="Обновить текущий раздел">Обновить <span aria-hidden="true">↻</span></button><button class="text-button mobile-logout" id="mobile-logout">Выйти</button></div></header>
+    <div class="availability-bar"><label class="availability-toggle"><input id="availability" type="checkbox" aria-label="Доступен для перевода"><span id="availability-label">Недоступен для перевода</span></label><span class="updated-at" id="updated-at" aria-live="off"></span></div>
+    <section id="view-content" tabindex="-1" aria-label="Содержимое раздела"></section>
+  </main>
+</div>
+<dialog id="editor-dialog" class="modal" aria-labelledby="editor-kind"><div class="modal-header"><span class="eyebrow" id="editor-kind">Редактирование</span><button class="icon-button" data-close aria-label="Закрыть">×</button></div><div id="editor-content"></div></dialog>
+<dialog id="request-dialog" class="modal request-drawer" aria-labelledby="request-heading"><div class="modal-header"><span class="eyebrow">Обращение</span><button class="icon-button" data-close aria-label="Закрыть">×</button></div><div id="request-content"></div></dialog>
+<div id="toast" class="toast" role="status" hidden></div><audio id="operator-audio" autoplay></audio>
+</body>
+</html>

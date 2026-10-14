@@ -40,3 +40,20 @@ async def test_retention_anonymizes_actions_and_outbox_too(business, session):
     assert "37529" not in json.dumps(
         await business.pool.fetchval("SELECT payload FROM outbox WHERE entity='Lead'")
     )
+
+
+async def test_retention_uses_the_conversation_policy_snapshot(business, session):
+    sid = session["uuid"]
+    await business.pool.execute("UPDATE sessions SET policy=jsonb_set(policy,'{text_days}','60') WHERE id=$1", sid)
+    draft = await business.draft(
+        sid, "callback", CallbackDraft(name="Тестовый клиент", phone="+375291234567", message="Тест"),
+    )
+    await business.confirm(sid, UUID(draft["id"]), draft["revision"], uuid4())
+    await business.pool.execute("UPDATE requests SET created_at=now()-interval '31 days'")
+    await business.pool.execute("UPDATE sessions SET ended_at=now()-interval '31 days',state='ended' WHERE id=$1", sid)
+    await enforce_retention(business.pool, 30)
+    assert await business.pool.fetchval("SELECT phone FROM requests LIMIT 1") == "+375291234567"
+    assert await business.pool.fetchval("SELECT EXISTS(SELECT 1 FROM sessions WHERE id=$1)", sid)
+    await business.pool.execute("UPDATE requests SET created_at=now()-interval '61 days'")
+    await enforce_retention(business.pool, 30)
+    assert await business.pool.fetchval("SELECT phone FROM requests LIMIT 1") == ""

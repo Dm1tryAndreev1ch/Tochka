@@ -1,0 +1,5 @@
+Tool: built-in image_gen (transparent_background=true)
+Reference: app/static/brand/phone-clean-v3.png
+Output: app/static/brand/phone-foreground-v4.png
+
+Precise edit of this isolated contour phone for a website. Keep the exact phone outline, tilt, proportions, thin aubergine lines, earpiece, side button, and handset call icon. Change only opacity inside the phone: fill the ENTIRE handset body and screen interior with a fully opaque uniform pale lavender #f2f0f4, right up to its outer silhouette, preserving the dark contour linework and icon over the fill. No see-through screen, no transparent gaps within the phone. The phone will sit IN FRONT OF a wave, so it must completely occlude anything behind its silhouette. Outside the phone silhouette must remain genuinely transparent alpha. No external rectangle, no card, no shadow, no glow, no haze, no added wave, no text. Keep the same portrait framing and phone size as the reference. Clean precise opaque foreground cutout.

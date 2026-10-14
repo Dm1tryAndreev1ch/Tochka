@@ -1,0 +1,28 @@
+{
+  "date":"2026-10-13",
+  "scenario":"Target MTS partner release, not a completed production acceptance",
+  "actual_stack":{"stt":"whisper.cpp large-v3-turbo q5 Metal","llm":"Qwen3-4B-Instruct-2507 Q4","tts":"Qwen3-TTS Base 0.6B MLX with Piper fallback","db":"PostgreSQL 16","crm":"EspoCRM 10.0.9","deployment":"Mac M4 16 GB, single-company, one active voice session"},
+  "observed_features":["WebRTC and chat","transactional confirmation/idempotent bookings","CRM outbox and retry","voice handoff and staff media bridge","FIFO 7 waiting / 300 seconds default","4 role permission presets with individual users","AES-GCM protected archive","purpose-based archive access","oral recording consent","per-call durations and LLM usage"],
+  "operator_gaps":["operator SSO and number ownership","subscriber service lifecycle","production operator connection","voice-to-chat verified recipient","financial billing and reconciliation","multiple organizations","distributed call ownership","horizontal scaling and full disaster recovery","formal ASR/NLU and device/load acceptance"],
+  "quality":{"acceptance_asr_min":94,"acceptance_nlu_min":94,"fleurs_dev_phone_word_accuracy":93.98148148148148,"fleurs_dev_combined_word_accuracy":87.5,"fleurs_words_per_profile":216,"minds_dev_phone_intent_accuracy":92.85714285714286,"minds_dev_combined_intent_accuracy":71.42857142857143,"minds_examples_per_profile":14,"warning":"Development diagnostics, acoustic simulations and bank taxonomy. Not final product acceptance. Thresholds have not been achieved."},
+  "verification":{"current_independent_unit_tests":5,"scope":"SecureStore object binding/tampering, CallQueue FIFO, LLM context budgets. Mock LLM transport, no production E2E.","historical_full_suite":73,"historical_full_scope":"artifacts/core-final-current.log, before final changes"},
+  "work_packages":[
+    {"name":"Голос, качество и регрессии","min_hours":160,"max_hours":280,"backlog":"D01–D08"},
+    {"name":"Абоненты, SSO, жизненный цикл","min_hours":200,"max_hours":360,"backlog":"D09–D11, D17"},
+    {"name":"Телефония и маршрутизация","min_hours":180,"max_hours":320,"backlog":"D12–D15"},
+    {"name":"Биллинг и сверка начислений","min_hours":180,"max_hours":300,"backlog":"D18, D29"},
+    {"name":"Защита данных и аудит","min_hours":120,"max_hours":240,"backlog":"D10, D19–D20, D26"},
+    {"name":"Инфраструктура и масштаб","min_hours":160,"max_hours":300,"backlog":"D21–D24"},
+    {"name":"Кабинет и подключение","min_hours":100,"max_hours":180,"backlog":"D16–D17, D25"},
+    {"name":"Интеграционная приёмка","min_hours":160,"max_hours":280,"backlog":"D27–D28"}
+  ],
+  "estimation_basis":"Independent rough engineering estimate from current code and D00–D29. Backlog tags identify scope, not double-counted separate line items. Hours belong to eight non-overlapping budget packages. Not an invoice, not past spending, not an operator offer.",
+  "assumptions":{"loaded_hourly_byn":80,"contingency":0.20,"external_preparation_min_byn":5000,"external_preparation_max_byn":15000,"planning_byn_per_usd":3,"hours_month":720,"gpu_reference_min_usd_hour":0.27,"gpu_reference_max_usd_hour":0.89,"cpu_db_min_byn_month":150,"cpu_db_max_byn_month":450,"storage_backup_min_byn_month":30,"storage_backup_max_byn_month":90,"support_min_hours_month":32,"support_max_hours_month":64,"sub_price_byn":9.9,"team_share":0.5,"telephony_tax_marketing_excluded":true,"concurrency_per_worker_not_benchmarked":true},
+  "references":[
+    {"url":"https://www.runpod.io/pricing","used_for":"Market comparison only: RTX A5000 24 GB $0.27/hour, RTX 4090 24 GB $0.89/hour, 2026-10-13 access. Not MTS internal costs and not recommended foreign production hosting."},
+    {"url":"https://orbstack.dev/pricing","used_for":"Mac commercial development environment: $8/user/month, $96/year billed annually; not a required production Linux license."},
+    {"url":"https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507","used_for":"Official model card and Apache-2.0 license"},
+    {"url":"https://huggingface.co/Qwen/Qwen3-TTS-12Hz-0.6B-Base","used_for":"Official TTS model card"},
+    {"url":"https://www.espocrm.com/download/","used_for":"Community self-hosted CRM; software cost does not include hosting and integration"}
+  ]
+}

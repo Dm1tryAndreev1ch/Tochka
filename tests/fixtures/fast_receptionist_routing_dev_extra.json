@@ -1,0 +1,557 @@
+{
+  "version": 1,
+  "created_before_implementation": true,
+  "limitations": "Synthetic author-written receptionist set, not a traffic distribution or proof of real-world majority. Fast coverage includes clarifications but never skipped safety checks. Heldout frozen before tuning.",
+  "now": "2026-10-13T12:00:00+03:00",
+  "services": [
+    {
+      "id": "consultation",
+      "name": "Консультация",
+      "description": "Разбор вопроса и рекомендации.",
+      "price": 45,
+      "duration": 30
+    },
+    {
+      "id": "diagnostics",
+      "name": "Диагностика",
+      "description": "Проверка устройства.",
+      "price": 70,
+      "duration": 60
+    },
+    {
+      "id": "setup",
+      "name": "Настройка",
+      "description": "Настройка программ.",
+      "price": 90,
+      "duration": 45
+    }
+  ],
+  "knowledge": [
+    {
+      "id": "1",
+      "title": "Адрес",
+      "content": "Адрес: Минск, улица Учебная, дом 18."
+    },
+    {
+      "id": "2",
+      "title": "Контакты",
+      "content": "Телефон для связи: +375 29 000 12 34. Электронная почта: info@example.test."
+    },
+    {
+      "id": "3",
+      "title": "Оплата",
+      "content": "Оплата принимается наличными и банковской картой. Оплата производится после оказания услуги."
+    },
+    {
+      "id": "4",
+      "title": "Гарантия",
+      "content": "Гарантия на настройку составляет 30 дней. Гарантия не распространяется на повреждения оборудования."
+    },
+    {
+      "id": "5",
+      "title": "Часы работы",
+      "content": "Работаем с понедельника по пятницу с 09:00 до 18:00. В субботу и воскресенье не работаем."
+    }
+  ],
+  "schedule": {
+    "opens": 9,
+    "closes": 18,
+    "weekdays": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "cases": [
+    {
+      "id": "supplemental_01",
+      "group": "hours_paraphrase",
+      "split": "dev",
+      "text": "До скольки?",
+      "context": {},
+      "expected": {
+        "route": "faq"
+      }
+    },
+    {
+      "id": "supplemental_02",
+      "group": "hours_paraphrase",
+      "split": "dev",
+      "text": "Во сколько закрываетесь?",
+      "context": {},
+      "expected": {
+        "route": "faq"
+      }
+    },
+    {
+      "id": "supplemental_03",
+      "group": "hours_paraphrase",
+      "split": "dev",
+      "text": "Можно в субботу?",
+      "context": {},
+      "expected": {
+        "route": "faq"
+      }
+    },
+    {
+      "id": "supplemental_04",
+      "group": "hours_paraphrase",
+      "split": "dev",
+      "text": "Вы открыты в субботу и воскресенье?",
+      "context": {},
+      "expected": {
+        "route": "faq"
+      }
+    },
+    {
+      "id": "supplemental_05",
+      "group": "custom",
+      "split": "dev",
+      "text": "Здравствуйте",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "agent_config": {
+        "instructions": "Уточните отдел прежде ответа."
+      }
+    },
+    {
+      "id": "supplemental_06",
+      "group": "custom",
+      "split": "dev",
+      "text": "Какие услуги?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "agent_config": {
+        "instructions": "Уточните отдел прежде ответа."
+      }
+    },
+    {
+      "id": "supplemental_07",
+      "group": "custom",
+      "split": "dev",
+      "text": "Запишите на консультацию",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "agent_config": {
+        "instructions": "Уточните отдел прежде ответа."
+      }
+    },
+    {
+      "id": "supplemental_08",
+      "group": "custom",
+      "split": "dev",
+      "text": "Какой адрес компании?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "agent_config": {
+        "instructions": "Уточните отдел прежде ответа."
+      }
+    },
+    {
+      "id": "supplemental_09",
+      "group": "custom_category",
+      "split": "dev",
+      "text": "Здравствуйте",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "agent_config": {
+        "category_schema": {
+          "required": [
+            "topic"
+          ]
+        }
+      }
+    },
+    {
+      "id": "supplemental_10",
+      "group": "custom_category",
+      "split": "dev",
+      "text": "Какие услуги?",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "agent_config": {
+        "category_schema": {
+          "required": [
+            "topic"
+          ]
+        }
+      }
+    },
+    {
+      "id": "supplemental_11",
+      "group": "custom_category",
+      "split": "dev",
+      "text": "анна",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "agent_config": {
+        "category_schema": {
+          "required": [
+            "topic"
+          ]
+        }
+      }
+    },
+    {
+      "id": "supplemental_12",
+      "group": "availability",
+      "split": "dev",
+      "text": "Есть свободное время на консультацию завтра?",
+      "context": {},
+      "expected": {
+        "route": "availability",
+        "service_id": "consultation",
+        "date": "2026-10-14"
+      }
+    },
+    {
+      "id": "supplemental_13",
+      "group": "availability",
+      "split": "dev",
+      "text": "Свободные окна на диагностику 16.10.2026?",
+      "context": {},
+      "expected": {
+        "route": "availability",
+        "service_id": "diagnostics",
+        "date": "2026-10-16"
+      }
+    },
+    {
+      "id": "supplemental_14",
+      "group": "availability_ambiguous",
+      "split": "dev",
+      "text": "Свободные окна на консультацию завтра после 12:00?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_15",
+      "group": "availability_ambiguous",
+      "split": "dev",
+      "text": "Есть свободное время завтра?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_16",
+      "group": "availability_ambiguous",
+      "split": "dev",
+      "text": "Свободные окна на консультацию завтра или послезавтра?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_17",
+      "group": "spoken_phone",
+      "split": "dev",
+      "text": "плюс три семь пять два девять ноль ноль ноль один два три четыре",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "phone": "+375290001234",
+        "absent": [
+          "name",
+          "date",
+          "time"
+        ]
+      }
+    },
+    {
+      "id": "supplemental_18",
+      "group": "spoken_phone",
+      "split": "dev",
+      "text": "Мой телефон: плюс три семь пять, два девять, ноль ноль ноль, один два три четыре.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "phone": "+375290001234",
+        "absent": [
+          "name",
+          "date",
+          "time"
+        ]
+      }
+    },
+    {
+      "id": "supplemental_19",
+      "group": "critical_ambiguous",
+      "split": "dev",
+      "text": "плюс три семь пять",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна"
+      },
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_20",
+      "group": "critical_ambiguous",
+      "split": "dev",
+      "text": "плюс 375290001234 abc",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна"
+      },
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_21",
+      "group": "critical_ambiguous",
+      "split": "dev",
+      "text": "плюс триста семьдесят пять двадцать девять ноль ноль ноль двенадцать тридцать четыре",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна"
+      },
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_22",
+      "group": "critical_ambiguous",
+      "split": "dev",
+      "text": "+375290001234 добавочный 12",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна"
+      },
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_23",
+      "group": "critical_ambiguous",
+      "split": "dev",
+      "text": "+375290001234 и +375290009999",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна"
+      },
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_24",
+      "group": "critical_ambiguous",
+      "split": "dev",
+      "text": "После 10:00.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна"
+      },
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_25",
+      "group": "critical_ambiguous",
+      "split": "dev",
+      "text": "Завтра и послезавтра.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна"
+      },
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_26",
+      "group": "unknown_multi",
+      "split": "dev",
+      "text": "Какой адрес сайта?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_27",
+      "group": "unknown_multi",
+      "split": "dev",
+      "text": "Адрес и скидки студентам?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_28",
+      "group": "unknown_multi",
+      "split": "dev",
+      "text": "Адрес и погода?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_29",
+      "group": "unknown_multi",
+      "split": "dev",
+      "text": "Соедините с оператором и расскажите о погоде.",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_30",
+      "group": "unknown_multi",
+      "split": "dev",
+      "text": "Где вы находитесь и сколько стоит консультация?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_31",
+      "group": "unknown_multi",
+      "split": "dev",
+      "text": "Какая гарантия на консультацию?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_32",
+      "group": "unknown_multi",
+      "split": "dev",
+      "text": "Можно оплатить переводом?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      }
+    },
+    {
+      "id": "supplemental_33",
+      "group": "faq_paraphrase",
+      "split": "dev",
+      "text": "Можно оплатить наличными и картой?",
+      "context": {},
+      "expected": {
+        "route": "faq"
+      }
+    },
+    {
+      "id": "supplemental_34",
+      "group": "faq_paraphrase",
+      "split": "dev",
+      "text": "Какая продолжительность консультации?",
+      "context": {},
+      "expected": {
+        "route": "faq"
+      }
+    },
+    {
+      "id": "supplemental_35",
+      "group": "custom_control",
+      "split": "dev",
+      "text": "Можно оплатить картой?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "agent_config": {
+        "instructions": "Уточните отдел прежде ответа."
+      }
+    },
+    {
+      "id": "supplemental_36",
+      "group": "custom_control",
+      "split": "dev",
+      "text": "Соедините с оператором",
+      "context": {},
+      "expected": {
+        "route": "intent",
+        "intent": "handoff"
+      },
+      "agent_config": {
+        "instructions": "Уточните отдел прежде ответа."
+      }
+    }
+  ],
+  "description": "Supplemental development only, created after base fixture freeze; not heldout evidence."
+}

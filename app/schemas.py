@@ -62,6 +62,7 @@ class Confirmation(BaseModel):
 class Login(BaseModel):
     password: str = Field(max_length=200)
     role: Literal["admin", "operator"] = "admin"
+    username: str | None = Field(default=None, pattern=r"^[A-Za-z0-9_.-]{2,60}$")
 
 
 class ServiceInput(BaseModel):
@@ -139,8 +140,12 @@ class Offer(BaseModel):
     type: Literal["offer"]
 
 
+class PlaybackReceipt(BaseModel):
+    played_chars: int = Field(ge=0, le=5000)
+
+
 class ExtractedIntent(BaseModel):
-    intent: Literal["faq", "conversation", "booking", "callback", "cancel_draft", "unknown"] = "unknown"
+    intent: Literal["faq", "conversation", "booking", "callback", "cancel_draft", "handoff", "unknown"] = "unknown"
     service_id: str | None = None
     name: str | None = Field(default=None, max_length=100)
     phone: str | None = Field(default=None, max_length=30)
@@ -148,3 +153,5 @@ class ExtractedIntent(BaseModel):
     time: str | None = Field(default=None, max_length=5)
     message: str | None = Field(default=None, max_length=2000)
     answer: str = Field(default="", max_length=1500)
+    fact_quotes: list[str] = Field(default_factory=list, max_length=3)
+    category: str | None = Field(default=None, max_length=80)

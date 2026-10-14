@@ -1,0 +1,1929 @@
+{
+  "version": 1,
+  "created_before_implementation": true,
+  "limitations": "Synthetic author-written receptionist set, not a traffic distribution or proof of real-world majority. Fast coverage includes clarifications but never skipped safety checks. Heldout frozen before tuning.",
+  "now": "2026-10-13T12:00:00+03:00",
+  "services": [
+    {
+      "id": "consultation",
+      "name": "Консультация",
+      "description": "Разбор вопроса и рекомендации.",
+      "price": 45,
+      "duration": 30
+    },
+    {
+      "id": "diagnostics",
+      "name": "Диагностика",
+      "description": "Проверка устройства.",
+      "price": 70,
+      "duration": 60
+    },
+    {
+      "id": "setup",
+      "name": "Настройка",
+      "description": "Настройка программ.",
+      "price": 90,
+      "duration": 45
+    }
+  ],
+  "knowledge": [
+    {
+      "id": "1",
+      "title": "Адрес",
+      "content": "Адрес: Минск, улица Учебная, дом 18."
+    },
+    {
+      "id": "2",
+      "title": "Контакты",
+      "content": "Телефон для связи: +375 29 000 12 34. Электронная почта: info@example.test."
+    },
+    {
+      "id": "3",
+      "title": "Оплата",
+      "content": "Оплата принимается наличными и банковской картой. Оплата производится после оказания услуги."
+    },
+    {
+      "id": "4",
+      "title": "Гарантия",
+      "content": "Гарантия на настройку составляет 30 дней. Гарантия не распространяется на повреждения оборудования."
+    },
+    {
+      "id": "5",
+      "title": "Часы работы",
+      "content": "Работаем с понедельника по пятницу с 09:00 до 18:00. В субботу и воскресенье не работаем."
+    }
+  ],
+  "schedule": {
+    "opens": 9,
+    "closes": 18,
+    "weekdays": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "cases": [
+    {
+      "id": "faq_address_01",
+      "group": "faq_address",
+      "text": "Какой адрес компании?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "Минск",
+          "Учебная"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_address_02",
+      "group": "faq_address",
+      "text": "Где вы находитесь?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "Минск",
+          "Учебная"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_address_03",
+      "group": "faq_address",
+      "text": "Назовите ваш адрес.",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "Минск",
+          "Учебная"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_address_04",
+      "group": "faq_address",
+      "text": "Где расположен офис?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "Минск",
+          "Учебная"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_address_05",
+      "group": "faq_address",
+      "text": "Как до вас добраться?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "Минск",
+          "Учебная"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_phone_01",
+      "group": "faq_phone",
+      "text": "Какой у вас телефон?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "+375 29 000 12 34"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_phone_02",
+      "group": "faq_phone",
+      "text": "Назовите номер компании.",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "+375 29 000 12 34"
+        ]
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "faq_phone_03",
+      "group": "faq_phone",
+      "text": "Как с вами связаться?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "+375 29 000 12 34"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_phone_04",
+      "group": "faq_phone",
+      "text": "Скажите ваш телефон для связи.",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "+375 29 000 12 34"
+        ]
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "faq_phone_05",
+      "group": "faq_phone",
+      "text": "Как вам позвонить?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "+375 29 000 12 34"
+        ]
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "faq_email_01",
+      "group": "faq_email",
+      "text": "Какая у вас электронная почта?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "info@example.test"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_email_02",
+      "group": "faq_email",
+      "text": "Назовите email компании.",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "info@example.test"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_email_03",
+      "group": "faq_email",
+      "text": "Куда написать вам письмо?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "info@example.test"
+        ]
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "faq_email_04",
+      "group": "faq_email",
+      "text": "Какой адрес электронной почты?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "info@example.test"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_email_05",
+      "group": "faq_email",
+      "text": "Скажите вашу почту.",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "info@example.test"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_hours_01",
+      "group": "faq_hours",
+      "text": "Какие часы работы?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "09:00",
+          "18:00"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_hours_02",
+      "group": "faq_hours",
+      "text": "Когда вы работаете?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "09:00",
+          "18:00"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_hours_03",
+      "group": "faq_hours",
+      "text": "Во сколько открываетесь?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "09:00",
+          "18:00"
+        ]
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "faq_hours_04",
+      "group": "faq_hours",
+      "text": "До скольки работаете?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "09:00",
+          "18:00"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_hours_05",
+      "group": "faq_hours",
+      "text": "Какой у вас график работы?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "09:00",
+          "18:00"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_weekends_01",
+      "group": "faq_weekends",
+      "text": "Вы работаете по выходным?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "субботу",
+          "воскресенье"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_weekends_02",
+      "group": "faq_weekends",
+      "text": "Можно прийти в субботу?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "субботу",
+          "воскресенье"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_weekends_03",
+      "group": "faq_weekends",
+      "text": "Открыты ли вы в воскресенье?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "субботу",
+          "воскресенье"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_weekends_04",
+      "group": "faq_weekends",
+      "text": "Как работаете в выходные?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "субботу",
+          "воскресенье"
+        ]
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "faq_weekends_05",
+      "group": "faq_weekends",
+      "text": "В субботу вы работаете?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "субботу",
+          "воскресенье"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_payment_01",
+      "group": "faq_payment",
+      "text": "Как можно оплатить услугу?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "наличными",
+          "картой"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_payment_02",
+      "group": "faq_payment",
+      "text": "Принимаете банковские карты?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "наличными",
+          "картой"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_payment_03",
+      "group": "faq_payment",
+      "text": "Можно оплатить наличными?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "наличными",
+          "картой"
+        ]
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "faq_payment_04",
+      "group": "faq_payment",
+      "text": "Какие способы оплаты?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "наличными",
+          "картой"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_payment_05",
+      "group": "faq_payment",
+      "text": "Оплата картой возможна?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "наличными",
+          "картой"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_warranty_01",
+      "group": "faq_warranty",
+      "text": "Какая гарантия на настройку?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "30 дней"
+        ]
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "faq_warranty_02",
+      "group": "faq_warranty",
+      "text": "Сколько длится гарантия?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "30 дней"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_warranty_03",
+      "group": "faq_warranty",
+      "text": "Есть ли гарантия?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "30 дней"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_warranty_04",
+      "group": "faq_warranty",
+      "text": "Расскажите о гарантии.",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "30 дней"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_warranty_05",
+      "group": "faq_warranty",
+      "text": "Какой гарантийный срок?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "30 дней"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_services_01",
+      "group": "faq_services",
+      "text": "Какие услуги есть?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "Консультация",
+          "Диагностика",
+          "Настройка"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_services_02",
+      "group": "faq_services",
+      "text": "Перечислите услуги.",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "Консультация",
+          "Диагностика",
+          "Настройка"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_services_03",
+      "group": "faq_services",
+      "text": "Что входит в список услуг?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "Консультация",
+          "Диагностика",
+          "Настройка"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_services_04",
+      "group": "faq_services",
+      "text": "Покажите прайс.",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "Консультация",
+          "Диагностика",
+          "Настройка"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_services_05",
+      "group": "faq_services",
+      "text": "Какие у вас услуги?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": [
+          "Консультация",
+          "Диагностика",
+          "Настройка"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_price_01",
+      "group": "faq_price",
+      "text": "Сколько стоит консультация?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": []
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_price_02",
+      "group": "faq_price",
+      "text": "Какая цена диагностики?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": []
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_price_03",
+      "group": "faq_price",
+      "text": "Стоимость настройки?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": []
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "faq_price_04",
+      "group": "faq_price",
+      "text": "Сколько стоит диагностика?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": []
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_price_05",
+      "group": "faq_price",
+      "text": "Назовите цену консультации.",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": []
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_duration_01",
+      "group": "faq_duration",
+      "text": "Сколько длится консультация?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": []
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "faq_duration_02",
+      "group": "faq_duration",
+      "text": "Какова продолжительность диагностики?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": []
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_duration_03",
+      "group": "faq_duration",
+      "text": "Сколько времени занимает настройка?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": []
+      },
+      "split": "dev"
+    },
+    {
+      "id": "faq_duration_04",
+      "group": "faq_duration",
+      "text": "За сколько минут проходит консультация?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": []
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "faq_duration_05",
+      "group": "faq_duration",
+      "text": "Долго ли длится диагностика?",
+      "context": {},
+      "expected": {
+        "route": "faq",
+        "contains": []
+      },
+      "split": "dev"
+    },
+    {
+      "id": "social_01",
+      "group": "social",
+      "text": "Здравствуйте!",
+      "context": {},
+      "expected": {
+        "route": "social"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "social_02",
+      "group": "social",
+      "text": "Привет.",
+      "context": {},
+      "expected": {
+        "route": "social"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "social_03",
+      "group": "social",
+      "text": "Добрый день.",
+      "context": {},
+      "expected": {
+        "route": "social"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "social_04",
+      "group": "social",
+      "text": "Спасибо!",
+      "context": {},
+      "expected": {
+        "route": "social"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "social_05",
+      "group": "social",
+      "text": "Благодарю.",
+      "context": {},
+      "expected": {
+        "route": "social"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "social_06",
+      "group": "social",
+      "text": "До свидания.",
+      "context": {},
+      "expected": {
+        "route": "social"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "social_07",
+      "group": "social",
+      "text": "Пока.",
+      "context": {},
+      "expected": {
+        "route": "social"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "social_08",
+      "group": "social",
+      "text": "Ты здесь?",
+      "context": {},
+      "expected": {
+        "route": "social"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "social_09",
+      "group": "social",
+      "text": "Вы меня слышите?",
+      "context": {},
+      "expected": {
+        "route": "social"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "social_10",
+      "group": "social",
+      "text": "Чем ты можешь помочь?",
+      "context": {},
+      "expected": {
+        "route": "social"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "booking_start_01",
+      "group": "booking_start",
+      "text": "Запишите меня на консультацию.",
+      "context": {},
+      "expected": {
+        "route": "intent",
+        "intent": "booking"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "booking_start_02",
+      "group": "booking_start",
+      "text": "Хочу записаться на диагностику.",
+      "context": {},
+      "expected": {
+        "route": "intent",
+        "intent": "booking"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "booking_start_03",
+      "group": "booking_start",
+      "text": "Запишите на настройку.",
+      "context": {},
+      "expected": {
+        "route": "intent",
+        "intent": "booking"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "booking_start_04",
+      "group": "booking_start",
+      "text": "Можно записаться на консультацию?",
+      "context": {},
+      "expected": {
+        "route": "intent",
+        "intent": "booking"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "booking_start_05",
+      "group": "booking_start",
+      "text": "Я хочу записаться.",
+      "context": {},
+      "expected": {
+        "route": "intent",
+        "intent": "booking"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "booking_date_01",
+      "group": "booking_date",
+      "text": "Завтра.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "required_fields": [
+          "date"
+        ],
+        "absent": [
+          "name",
+          "time"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "booking_date_02",
+      "group": "booking_date",
+      "text": "Послезавтра.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "required_fields": [
+          "date"
+        ],
+        "absent": [
+          "name",
+          "time"
+        ]
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "booking_date_03",
+      "group": "booking_date",
+      "text": "Сегодня.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "required_fields": [
+          "date"
+        ],
+        "absent": [
+          "name",
+          "time"
+        ]
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "booking_date_04",
+      "group": "booking_date",
+      "text": "На 16.10.2026.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "required_fields": [
+          "date"
+        ],
+        "absent": [
+          "name",
+          "time"
+        ]
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "booking_time_01",
+      "group": "booking_time",
+      "text": "В 11:00.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "required_fields": [
+          "time"
+        ],
+        "absent": [
+          "name",
+          "date"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "booking_time_02",
+      "group": "booking_time",
+      "text": "В девять.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "required_fields": [
+          "time"
+        ],
+        "absent": [
+          "name",
+          "date"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "booking_time_03",
+      "group": "booking_time",
+      "text": "09:15",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "required_fields": [
+          "time"
+        ],
+        "absent": [
+          "name",
+          "date"
+        ]
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "booking_time_04",
+      "group": "booking_time",
+      "text": "двадцать один",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "required_fields": [
+          "time"
+        ],
+        "absent": [
+          "name",
+          "date"
+        ]
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "booking_name_01",
+      "group": "booking_name",
+      "text": "анна",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "required_fields": [
+          "name"
+        ],
+        "absent": [
+          "phone",
+          "time",
+          "date"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "booking_name_02",
+      "group": "booking_name",
+      "text": "Я Анна.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "required_fields": [
+          "name"
+        ],
+        "absent": [
+          "phone",
+          "time",
+          "date"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "booking_name_03",
+      "group": "booking_name",
+      "text": "БОРИС УЧЕБНЫЙ",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "required_fields": [
+          "name"
+        ],
+        "absent": [
+          "phone",
+          "time",
+          "date"
+        ]
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "booking_name_04",
+      "group": "booking_name",
+      "text": "Елена Петрова",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "required_fields": [
+          "name"
+        ],
+        "absent": [
+          "phone",
+          "time",
+          "date"
+        ]
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "booking_phone_01",
+      "group": "booking_phone",
+      "text": "+375290001234",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "required_fields": [
+          "phone"
+        ],
+        "absent": [
+          "name",
+          "time",
+          "date"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "booking_phone_02",
+      "group": "booking_phone",
+      "text": "Телефон +375 (29) 000-12-34.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "required_fields": [
+          "phone"
+        ],
+        "absent": [
+          "name",
+          "time",
+          "date"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "booking_phone_03",
+      "group": "booking_phone",
+      "text": "Мой номер +375290009999.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking",
+        "required_fields": [
+          "phone"
+        ],
+        "absent": [
+          "name",
+          "time",
+          "date"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "correction_01",
+      "group": "correction",
+      "text": "Нет, лучше в 12:00.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна",
+        "phone": "+375290001234"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "correction_02",
+      "group": "correction",
+      "text": "Исправьте время на 13:15.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна",
+        "phone": "+375290001234"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "correction_03",
+      "group": "correction",
+      "text": "Имя исправьте на Борис Учебный.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна",
+        "phone": "+375290001234"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "correction_04",
+      "group": "correction",
+      "text": "Телефон замените на +375290001235.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16",
+        "time": "11:00",
+        "name": "Анна",
+        "phone": "+375290001234"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "booking"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "callback_01",
+      "group": "callback",
+      "text": "Перезвоните мне.",
+      "context": {},
+      "expected": {
+        "route": "intent",
+        "intent": "callback"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "callback_02",
+      "group": "callback",
+      "text": "Хочу обратный звонок.",
+      "context": {},
+      "expected": {
+        "route": "intent",
+        "intent": "callback"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "callback_03",
+      "group": "callback",
+      "text": "Попросите сотрудника перезвонить.",
+      "context": {},
+      "expected": {
+        "route": "intent",
+        "intent": "callback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "callback_message_01",
+      "group": "callback_message",
+      "text": "Вопрос: срок ремонта ноутбука.",
+      "context": {
+        "intent": "callback"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "callback",
+        "required_fields": [
+          "message"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "callback_message_02",
+      "group": "callback_message",
+      "text": "Сообщение: нужно уточнить комплектацию.",
+      "context": {
+        "intent": "callback"
+      },
+      "expected": {
+        "route": "intent",
+        "intent": "callback",
+        "required_fields": [
+          "message"
+        ]
+      },
+      "split": "dev"
+    },
+    {
+      "id": "handoff_01",
+      "group": "handoff",
+      "text": "Соедините с оператором.",
+      "context": {},
+      "expected": {
+        "route": "intent",
+        "intent": "handoff"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "handoff_02",
+      "group": "handoff",
+      "text": "Хочу поговорить с человеком.",
+      "context": {},
+      "expected": {
+        "route": "intent",
+        "intent": "handoff"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "handoff_03",
+      "group": "handoff",
+      "text": "Позовите администратора.",
+      "context": {},
+      "expected": {
+        "route": "intent",
+        "intent": "handoff"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "handoff_04",
+      "group": "handoff",
+      "text": "Мне нужен сотрудник.",
+      "context": {},
+      "expected": {
+        "route": "intent",
+        "intent": "handoff"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "cancel_01",
+      "group": "cancel",
+      "text": "Отмените черновик.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation"
+      },
+      "expected": {
+        "route": "control",
+        "control": "cancel_draft"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "cancel_02",
+      "group": "cancel",
+      "text": "Я передумал.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation"
+      },
+      "expected": {
+        "route": "control",
+        "control": "cancel_draft"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "cancel_03",
+      "group": "cancel",
+      "text": "Отмена.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation"
+      },
+      "expected": {
+        "route": "control",
+        "control": "cancel_draft"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "confirm_01",
+      "group": "confirm",
+      "text": "Да.",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "control",
+        "control": "confirm"
+      },
+      "has_draft": true,
+      "split": "heldout"
+    },
+    {
+      "id": "confirm_02",
+      "group": "confirm",
+      "text": "Подтверждаю.",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "control",
+        "control": "confirm"
+      },
+      "has_draft": true,
+      "split": "dev"
+    },
+    {
+      "id": "confirm_03",
+      "group": "confirm",
+      "text": "Да, всё верно.",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "control",
+        "control": "confirm"
+      },
+      "has_draft": true,
+      "split": "dev"
+    },
+    {
+      "id": "consent_01",
+      "group": "consent",
+      "text": "Да, я согласен.",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "needs_consent": true,
+      "split": "dev"
+    },
+    {
+      "id": "consent_02",
+      "group": "consent",
+      "text": "Не разрешаю.",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "needs_consent": true,
+      "split": "heldout"
+    },
+    {
+      "id": "consent_03",
+      "group": "consent",
+      "text": "Разрешаю запись разговора.",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "needs_consent": true,
+      "split": "heldout"
+    },
+    {
+      "id": "unknown_01",
+      "group": "unknown",
+      "text": "Какая завтра погода?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "unknown_02",
+      "group": "unknown",
+      "text": "Есть ли у вас парковка?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "unknown_03",
+      "group": "unknown",
+      "text": "Какие скидки студентам?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "unknown_04",
+      "group": "unknown",
+      "text": "Можно заказать курьера?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "unknown_05",
+      "group": "unknown",
+      "text": "Есть рассрочка на полгода?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "unknown_06",
+      "group": "unknown",
+      "text": "Вы принимаете криптовалюту?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "unknown_07",
+      "group": "unknown",
+      "text": "Можно оплатить переводом?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "unknown_08",
+      "group": "unknown",
+      "text": "Какова гарантия на консультацию?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "unknown_09",
+      "group": "unknown",
+      "text": "Как работаете в праздники?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "unknown_10",
+      "group": "unknown",
+      "text": "Как найти вход со двора?",
+      "context": {},
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "multi_01",
+      "group": "multi",
+      "text": "Сколько стоит консультация и запишите меня на завтра.",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "multi_02",
+      "group": "multi",
+      "text": "Назовите адрес и соедините с оператором.",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "multi_03",
+      "group": "multi",
+      "text": "Какая гарантия и сколько стоит диагностика?",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "multi_04",
+      "group": "multi",
+      "text": "Какой телефон и адрес?",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "multi_05",
+      "group": "multi",
+      "text": "Запишите на консультацию и перезвоните мне.",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "multi_06",
+      "group": "multi",
+      "text": "Отмените черновик и запишите на диагностику.",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "negative_01",
+      "group": "negative",
+      "text": "Не хочу записываться.",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "negative_02",
+      "group": "negative",
+      "text": "Не соединяйте с оператором.",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "negative_03",
+      "group": "negative",
+      "text": "Не отменяйте запись.",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "negative_04",
+      "group": "negative",
+      "text": "Я спрашиваю про запись звука.",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "negative_05",
+      "group": "negative",
+      "text": "Что такое диагностика?",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "negative_06",
+      "group": "negative",
+      "text": "Не звоните мне.",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "negative_07",
+      "group": "negative",
+      "text": "Не консультация, а диагностика.",
+      "context": {
+        "intent": "booking"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "ambiguous_01",
+      "group": "ambiguous",
+      "text": "Запишите на консультацию или диагностику.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "ambiguous_02",
+      "group": "ambiguous",
+      "text": "Лучше в девять или в десять.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "ambiguous_03",
+      "group": "ambiguous",
+      "text": "Имя не Анна, а Елена.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "ambiguous_04",
+      "group": "ambiguous",
+      "text": "Через какое-то время.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "ambiguous_05",
+      "group": "ambiguous",
+      "text": "Любой день подойдёт.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "ambiguous_06",
+      "group": "ambiguous",
+      "text": "Запишите на услугу, которую обсуждали.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "complex_fields_01",
+      "group": "complex_fields",
+      "text": "Через неделю.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "complex_fields_02",
+      "group": "complex_fields",
+      "text": "14-го.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "complex_fields_03",
+      "group": "complex_fields",
+      "text": "В девять часов пятнадцать минут.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "heldout"
+    },
+    {
+      "id": "complex_fields_04",
+      "group": "complex_fields",
+      "text": "Девять тридцать.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    },
+    {
+      "id": "complex_fields_05",
+      "group": "complex_fields",
+      "text": "Плюс триста семьдесят пять, двадцать девять, ноль ноль ноль, двенадцать, тридцать четыре.",
+      "context": {
+        "intent": "booking",
+        "service_id": "consultation",
+        "date": "2026-10-16"
+      },
+      "expected": {
+        "route": "fallback"
+      },
+      "split": "dev"
+    }
+  ]
+}

@@ -16,12 +16,17 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.websockets import WebSocketDisconnect
 
 from app import db
+from app.access import Principal, password_matches, route_permission
+from app.archive import ConversationArchive
+from app.archive_api import Purpose, archive_entry, archive_router
+from app.background import run_background
 from app.business import Business, json_record, token_hash
 from app.call_modes import CallModes
 from app.config import ROOT, settings
 from app.dialogue import Dialogue, EventBus
 from app.errors import AppError
 from app.models import LocalModels
+from app.policy import current_policy, notice
 from app.schemas import (
     Availability,
     BookingDraft,
@@ -35,6 +40,7 @@ from app.schemas import (
     Message,
     Offer,
     OperatorReply,
+    PlaybackReceipt,
     ScheduleInput,
     ServiceInput,
     SessionCreate,
@@ -42,14 +48,14 @@ from app.schemas import (
     TelegramAuthorization,
     TelegramCode,
 )
+from app.workspace import workspace_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 log = logging.getLogger("voice")
 
 
-async def housekeeping(app):
-    while True:
-        await asyncio.sleep(60)
+async def housekeeping(app, interval=60):
+    async def clean():
         expired = await app.state.pool.fetch(
             "UPDATE sessions SET ended_at=now(),state='ended' WHERE expires_at<now() AND ended_at IS NULL RETURNING id"
         )
@@ -60,9 +66,23 @@ async def housekeeping(app):
         await app.state.pool.execute("DELETE FROM admin_sessions WHERE expires_at<now()")
         from app.privacy import enforce_retention
 
+        if getattr(app.state, "archive", None):
+            await app.state.archive.recover_completed()
         await enforce_retention(app.state.pool, settings.retention_days)
+        if getattr(app.state, "archive", None):
+            await app.state.archive.purge()
         if getattr(app.state, "socket_calls", None):
             await app.state.socket_calls.purge()
+
+    if not hasattr(app.state, "background_status"):
+        app.state.background_status = {}
+    await run_background(
+        "housekeeping",
+        clean,
+        interval=interval,
+        initial_delay=True,
+        status=app.state.background_status.setdefault("housekeeping", {}),
+    )
 
 
 @asynccontextmanager
@@ -73,11 +93,31 @@ async def lifespan(app):
     from app.voice import VoiceManager
 
     app.state.pool = await db.connect(settings.database_url)
+    app.state.background_status = {}
     app.state.events = EventBus()
     app.state.business = Business(app.state.pool)
     app.state.models = LocalModels()
+
+    async def meter_llm(sid, usage, elapsed):
+        values = usage or {}
+        await app.state.pool.execute(
+            "INSERT INTO session_usage(session_id,llm_requests,prompt_tokens,completion_tokens,unreported_requests,llm_seconds) "
+            "SELECT id,1,$2,$3,$4,$5 FROM sessions WHERE id=$1 ON CONFLICT(session_id) DO UPDATE SET "
+            "llm_requests=session_usage.llm_requests+1,prompt_tokens=session_usage.prompt_tokens+EXCLUDED.prompt_tokens,"
+            "completion_tokens=session_usage.completion_tokens+EXCLUDED.completion_tokens,unreported_requests=session_usage.unreported_requests+EXCLUDED.unreported_requests,llm_seconds=session_usage.llm_seconds+EXCLUDED.llm_seconds",
+            UUID(sid),
+            int(values.get("prompt_tokens", 0)),
+            int(values.get("completion_tokens", 0)),
+            0 if usage else 1,
+            elapsed,
+        )
+
+    app.state.models.usage_callback = meter_llm
     app.state.dialogue = Dialogue(app.state.business, app.state.models, app.state.events)
     app.state.voice = VoiceManager(app.state.business, app.state.models, app.state.dialogue, app.state.events)
+    app.state.archive = ConversationArchive(app.state.pool)
+    app.state.voice.archive = app.state.archive
+    app.state.dialogue.on_handoff = app.state.voice.request_handoff
     app.state.crm = CRMWorker(app.state.pool)
     app.state.socket_calls = None
     if settings.socket_transport_enabled and len(settings.channel_api_key) >= 16:
@@ -180,7 +220,57 @@ async def security(request: Request, call_next):
                 )
             chunks.append(chunk)
         request._body = b"".join(chunks)
-    response = await call_next(request)
+    protected = (
+        request.url.path.startswith("/api/v1/operator/") and request.url.path != "/api/v1/operator/login"
+    )
+
+    async def execute(connection=None):
+        response = await call_next(request)
+        principal = getattr(request.state, "principal", None)
+        if protected and (principal or response.status_code in (401, 403)):
+            await db.audit(
+                connection or app.state.pool,
+                principal or "anonymous",
+                "api_mutation" if request.method not in ("GET", "HEAD") else "api_read",
+                request.url.path,
+                {"method": request.method, "status": response.status_code},
+                request_id=request_id,
+                purpose="service_support",
+                outcome="allowed" if response.status_code < 400 else "denied",
+            )
+        return response
+
+    if protected and request.method not in ("GET", "HEAD", "OPTIONS"):
+        async with app.state.pool.acquire() as connection:
+            transaction = connection.transaction()
+            await transaction.start()
+            context = {"connection": connection, "active": True}
+            token = db.request_connection.set(context)
+            try:
+                response = await execute(connection)
+                if response.status_code >= 400:
+                    await transaction.rollback()
+                    await db.audit(
+                        connection,
+                        getattr(request.state, "principal", "anonymous"),
+                        "api_denied",
+                        request.url.path,
+                        {"method": request.method, "status": response.status_code},
+                        request_id=request_id,
+                        purpose="service_support",
+                        outcome="denied",
+                    )
+                else:
+                    await transaction.commit()
+            except BaseException:
+                with contextlib.suppress(Exception):
+                    await transaction.rollback()
+                raise
+            finally:
+                context["active"] = False
+                db.request_connection.reset(token)
+    else:
+        response = await execute()
     response.headers.update(
         {
             "X-Request-ID": request_id,
@@ -254,12 +344,23 @@ async def customer(session_id: UUID, authorization: str = Header(default="")):
     return await app.state.business.session(session_id, token)
 
 
-async def operator(vdesk_admin: str = Cookie(default="")):
-    role = await app.state.pool.fetchval(
-        "SELECT role FROM admin_sessions WHERE token_hash=$1 AND expires_at>now()", token_hash(vdesk_admin)
+async def operator(request: Request, vdesk_admin: str = Cookie(default="")):
+    row = await app.state.pool.fetchrow(
+        "SELECT u.* FROM admin_sessions s JOIN staff_users u ON u.id=s.user_id WHERE s.token_hash=$1 AND s.expires_at>now() AND u.active",
+        token_hash(vdesk_admin),
     )
-    if not role:
+    if not row:
         raise AppError("unauthorized", "Войдите в кабинет", 401)
+    role = Principal(row, token_hash(vdesk_admin))
+    request.state.principal = role
+    if permission := route_permission(request.url.path, request.method):
+        try:
+            role.require(permission)
+        except AppError:
+            await db.audit(
+                app.state.pool, role, "access_denied", request.url.path, {"permission": permission}
+            )
+            raise
     return role
 
 
@@ -267,6 +368,10 @@ async def administrator(role=Depends(operator)):
     if role != "admin":
         raise AppError("forbidden", "Нужны права администратора", 403)
     return role
+
+
+app.include_router(workspace_router(operator))
+app.include_router(archive_router(operator))
 
 
 def channel_authorized(authorization: str = Header(default="")):
@@ -367,6 +472,11 @@ async def operator_page():
     return FileResponse(ROOT / "app/static/operator.html")
 
 
+@app.get("/landing", include_in_schema=False)
+async def landing_page():
+    return FileResponse(ROOT / "app/static/landing.html")
+
+
 @app.get("/manage")
 async def manage_page():
     return FileResponse(ROOT / "app/static/manage.html")
@@ -383,11 +493,24 @@ async def live():
 
 
 @app.get("/api/v1/health/ready")
-async def ready():
+async def ready(response: Response):
+    data = await readiness()
+    response.status_code = 200 if data["status"] == "ready" else 503
+    return data
+
+
+async def readiness():
     llm = await app.state.models.llm_ready()
-    database = await app.state.pool.fetchval("SELECT 1") == 1
-    voice = app.state.models.ready and llm
-    selected = (await CallModes(app.state.pool).selection())["mode"]
+    selected = None
+    database_error = None
+    try:
+        async with asyncio.timeout(3):
+            database = await app.state.pool.fetchval("SELECT 1") == 1
+            selected = (await CallModes(app.state.pool).selection())["mode"]
+    except Exception as exc:
+        database = False
+        database_error = type(exc).__name__
+    voice = database and app.state.models.ready and llm
     tts = (
         await app.state.models.tts_status()
         if hasattr(app.state.models, "tts_status")
@@ -396,6 +519,8 @@ async def ready():
     return {
         "status": "ready" if voice else "degraded",
         "database": database,
+        "database_error": database_error,
+        "background": getattr(app.state, "background_status", {}),
         "stt": app.state.models.ready,
         "tts": app.state.models.ready,
         "tts_backend": tts["backend"],
@@ -404,6 +529,8 @@ async def ready():
         "llm": llm,
         "voice_available": voice,
         "voice_busy": app.state.voice.active is not None,
+        "queue_length": len(app.state.voice.queue.waiting) if hasattr(app.state.voice, "queue") else 0,
+        "queue_capacity": settings.call_queue_capacity,
         "call_mode": selected,
         "website_calls_enabled": selected == "website",
         "crm_configured": bool(settings.espo_api_key),
@@ -417,6 +544,12 @@ async def ready():
 @app.get("/api/v1/services")
 async def services():
     return {"items": await app.state.business.services(), "test_company": True}
+
+
+@app.get("/api/v1/policy")
+async def public_policy():
+    policy = await current_policy(app.state.pool)
+    return {**policy, "notice": notice(policy), "audio_confirmation": "oral"}
 
 
 @app.get("/api/v1/voice-profiles")
@@ -479,10 +612,8 @@ async def new_session(data: SessionCreate, request: Request):
             raise AppError(
                 "voice_unavailable", "Голосовые модели ещё не готовы. Доступны чат и форма записи", 503
             )
-        if app.state.voice.active is not None:
-            raise AppError(
-                "voice_busy", "Помощник сейчас разговаривает. Оставьте заявку или попробуйте позже", 409
-            )
+        if hasattr(app.state.voice, "queue") and not app.state.voice.queue.available:
+            raise AppError("call_queue_full", "Очередь заполнена. Оставьте заявку или попробуйте позже", 429)
         if data.voice_profile == "female" and not (await app.state.models.tts_status()).get("natural_ready"):
             raise AppError(
                 "voice_unavailable",
@@ -495,7 +626,8 @@ async def new_session(data: SessionCreate, request: Request):
 @app.get("/api/v1/sessions/{session_id}")
 async def session_detail(session_id: UUID, session=Depends(customer)):
     turns = await app.state.pool.fetch(
-        "SELECT id,role,text,created_at FROM turns WHERE session_id=$1 ORDER BY id DESC LIMIT 100", session_id
+        "SELECT id,role,text,generated_text,delivery,created_at FROM turns WHERE session_id=$1 ORDER BY id DESC LIMIT 100",
+        session_id,
     )
     actions = await app.state.pool.fetch(
         "SELECT id,result FROM actions WHERE session_id=$1 AND result<>'{}'::jsonb ORDER BY created_at DESC LIMIT 20",
@@ -511,9 +643,19 @@ async def session_detail(session_id: UUID, session=Depends(customer)):
 
 
 @app.post("/api/v1/sessions/{session_id}/messages")
-async def message(session_id: UUID, data: Message, session=Depends(customer)):
+async def message(session_id: UUID, data: Message, request: Request, session=Depends(customer)):
+    limit("message-ip:" + request.client.host, 20, 60)
     limit("message:" + str(session_id), 20)
     return await app.state.dialogue.message(session_id, data.text, data.idempotency_key)
+
+
+@app.put("/api/v1/sessions/{session_id}/playbacks/{utterance_id}")
+async def playback_receipt(
+    session_id: UUID, utterance_id: UUID, data: PlaybackReceipt, session=Depends(customer)
+):
+    if session["channel"] != "voice":
+        raise AppError("playback_channel", "Подтверждение требуется только для голосового разговора", 409)
+    return await app.state.dialogue.acknowledge_playback(session_id, utterance_id, data.played_chars)
 
 
 @app.post("/api/v1/sessions/{session_id}/drafts/bookings", status_code=201)
@@ -547,12 +689,15 @@ async def cancel_draft(session_id: UUID, draft_id: UUID, session=Depends(custome
 async def end_session(session_id: UUID, session=Depends(customer)):
     await app.state.business.end(session_id)
     await app.state.voice.end(session_id)
+    if getattr(app.state, "archive", None):
+        await app.state.archive.finalize(session_id)
     app.state.dialogue.release(session_id)
     await app.state.events.emit(session_id, {"type": "ended"})
 
 
 @app.post("/api/v1/sessions/{session_id}/offer")
-async def offer(session_id: UUID, data: Offer, session=Depends(customer)):
+async def offer(session_id: UUID, data: Offer, request: Request, session=Depends(customer)):
+    limit("offer:" + request.client.host, 8, 60)
     await CallModes(app.state.pool).require("website")
     if session["channel"] != "voice":
         raise AppError("wrong_channel", "Для микрофона начните голосовой разговор", 409)
@@ -561,24 +706,10 @@ async def offer(session_id: UUID, data: Offer, session=Depends(customer)):
 
 @app.post("/api/v1/sessions/{session_id}/handoffs", status_code=201)
 async def handoff(session_id: UUID, session=Depends(customer)):
-    available = (
-        await app.state.pool.fetchval("SELECT value->>'available' FROM settings WHERE key='operator'")
-        == "true"
-    )
-    if not available:
-        return {
-            "status": "unavailable",
-            "message": "Сотрудник сейчас недоступен. Оставьте заявку на обратный звонок.",
-        }
-    await app.state.pool.execute(
-        "UPDATE sessions SET state='handoff_pending' WHERE id=$1 AND state='bot'", session_id
-    )
-    await app.state.events.emit(
-        session_id,
-        {"type": "handoff_pending", "message": "Запрос отправлен сотруднику. Ожидаем ответа до 30 секунд."},
-    )
-    app.state.voice.request_handoff(session_id)
-    return {"status": "pending", "message": "Запрос отправлен сотруднику"}
+    result = await app.state.dialogue.request_handoff(session_id)
+    if result["status"] == "pending":
+        app.state.voice.request_handoff(session_id)
+    return result
 
 
 @app.post("/api/v1/bookings/management")
@@ -599,15 +730,18 @@ async def change_management(data: ManagementChange, request: Request):
 @app.post("/api/v1/operator/login")
 async def login(data: Login, request: Request, response: Response):
     limit("login:" + request.client.host, 5, 60)
-    expected = settings.admin_password if data.role == "admin" else settings.operator_password
-    if not expected or not secrets.compare_digest(data.password.encode(), expected.encode()):
+    user = await app.state.pool.fetchrow(
+        "SELECT * FROM staff_users WHERE username=$1 AND active", data.username or data.role
+    )
+    if not user or not await asyncio.to_thread(password_matches, data.password, user["password_hash"]):
         raise AppError("invalid_credentials", "Неверный пароль", 401)
     token = secrets.token_urlsafe(32)
     await app.state.pool.execute(
-        "INSERT INTO admin_sessions(token_hash,expires_at,role) VALUES($1,$2,$3)",
+        "INSERT INTO admin_sessions(token_hash,expires_at,role,user_id) VALUES($1,$2,$3,$4)",
         token_hash(token),
         datetime.now(UTC) + timedelta(hours=8),
-        data.role,
+        user["role"],
+        user["id"],
     )
     response.set_cookie(
         "vdesk_admin",
@@ -617,19 +751,34 @@ async def login(data: Login, request: Request, response: Response):
         samesite="strict",
         max_age=28800,
     )
-    await db.audit(app.state.pool, data.role, "login")
-    return {"role": data.role}
+    principal = Principal(user, token_hash(token))
+    await db.audit(app.state.pool, principal, "login")
+    return {
+        "role": str(principal),
+        "user_id": str(principal.user_id),
+        "username": principal.username,
+        "permissions": sorted(principal.permissions),
+    }
 
 
 @app.post("/api/v1/operator/logout", status_code=204)
-async def logout(response: Response, vdesk_admin: str = Cookie(default="")):
+async def logout(response: Response, vdesk_admin: str = Cookie(default=""), role=Depends(operator)):
+    await db.audit(app.state.pool, role, "logout")
     await app.state.pool.execute("DELETE FROM admin_sessions WHERE token_hash=$1", token_hash(vdesk_admin))
+    if hasattr(app.state.voice, "revoke_staff"):
+        await app.state.voice.revoke_staff(session_hash=token_hash(vdesk_admin))
     response.delete_cookie("vdesk_admin")
 
 
 @app.get("/api/v1/operator/me")
 async def me(role=Depends(operator)):
-    return {"role": role}
+    return {
+        "role": str(role),
+        "user_id": str(role.user_id),
+        "username": role.username,
+        "display_name": role.display_name,
+        "permissions": sorted(role.permissions),
+    }
 
 
 @app.get("/api/v1/operator/overview")
@@ -720,14 +869,23 @@ async def sessions(role=Depends(operator)):
 
 
 @app.get("/api/v1/operator/sessions/{sid}")
-async def operator_session(sid: UUID, role=Depends(operator)):
+async def operator_session(sid: UUID, request: Request, purpose: Purpose | None = None, role=Depends(operator)):
     row = await app.state.pool.fetchrow(
         "SELECT id,channel,source,voice_profile,state,created_at,ended_at FROM sessions WHERE id=$1", sid
     )
     if not row:
         raise AppError("not_found", "Разговор не найден", 404)
+    if row["ended_at"]:
+        role.require("archive.text")
+        if purpose is None:
+            raise AppError("archive_purpose_required", "Выберите цель доступа в защищённом архиве", 422)
+        await archive_entry(app.state.pool, sid, "transcript")
+        turns = await app.state.archive.transcript(sid)
+        await db.audit(app.state.pool, role, "archive_transcript_read", sid, purpose=purpose, request_id=request.state.request_id)
+        return {**json_record(row), "turns": turns}
     turns = await app.state.pool.fetch(
-        "SELECT role,text,created_at FROM turns WHERE session_id=$1 ORDER BY id LIMIT 200", sid
+        "SELECT role,text,generated_text,delivery,created_at FROM turns WHERE session_id=$1 ORDER BY id LIMIT 200",
+        sid,
     )
     await db.audit(app.state.pool, role, "transcript_viewed", sid)
     return {**json_record(row), "turns": [json_record(r) for r in turns]}
@@ -745,8 +903,9 @@ async def accept_handoff(sid: UUID, role=Depends(operator)):
     if channel == "voice":
         raise AppError("microphone_required", "Для приёма голосового разговора подключите микрофон", 409)
     row = await app.state.pool.fetchrow(
-        "UPDATE sessions SET state='human' WHERE id=$1 AND state='handoff_pending' AND ended_at IS NULL RETURNING channel",
+        "UPDATE sessions SET state='human',assigned_user_id=$2 WHERE id=$1 AND state='handoff_pending' AND ended_at IS NULL RETURNING channel",
         sid,
+        role.user_id,
     )
     if not row:
         raise AppError("handoff_unavailable", "Этот разговор уже завершён или не ожидает сотрудника", 409)
@@ -760,7 +919,7 @@ async def accept_handoff(sid: UUID, role=Depends(operator)):
 
 @app.post("/api/v1/operator/sessions/{sid}/offer")
 async def operator_offer(sid: UUID, data: Offer, role=Depends(operator)):
-    return await app.state.voice.operator_offer(sid, data.sdp, data.type)
+    return await app.state.voice.operator_offer(sid, data.sdp, data.type, role)
 
 
 @app.post("/api/v1/operator/sessions/{sid}/messages")
@@ -768,6 +927,11 @@ async def operator_message(sid: UUID, data: OperatorReply, role=Depends(operator
     state = await app.state.pool.fetchval("SELECT state FROM sessions WHERE id=$1 AND ended_at IS NULL", sid)
     if state != "human":
         raise AppError("handoff_required", "Сначала примите разговор", 409)
+    if (
+        await app.state.pool.fetchval("SELECT assigned_user_id FROM sessions WHERE id=$1", sid)
+        != role.user_id
+    ):
+        raise AppError("forbidden", "Этот разговор принят другим сотрудником", 403)
     await app.state.pool.execute(
         "INSERT INTO turns(session_id,role,text) VALUES($1,'operator',$2)", sid, data.text
     )
@@ -889,7 +1053,9 @@ async def retry(oid: UUID, role=Depends(operator)):
 
 @app.get("/api/v1/operator/metrics")
 async def metrics(role=Depends(operator)):
-    data = await ready()
+    data = await readiness()
+    data["llm_model"] = settings.llm_model
+    data["llm_prompt_profile"] = settings.llm_prompt_profile
     data["metrics"] = app.state.models.stats
     data["voice"] = app.state.voice.metrics
     data["last_crm_sync"] = app.state.crm.last_ok.isoformat() if app.state.crm.last_ok else None
@@ -897,7 +1063,7 @@ async def metrics(role=Depends(operator)):
 
 
 @app.get("/api/v1/operator/audit")
-async def audit_list(before: int | None = None, role=Depends(administrator)):
+async def audit_list(before: int | None = None, role=Depends(operator)):
     rows = await app.state.pool.fetch(
         "SELECT * FROM audit WHERE ($1::bigint IS NULL OR id<$1) ORDER BY id DESC LIMIT 50", before
     )
@@ -920,7 +1086,7 @@ async def events(websocket: WebSocket, session_id: UUID):
         auth = await asyncio.wait_for(websocket.receive_json(), 5)
         if auth.get("operator"):
             role = await app.state.pool.fetchval(
-                "SELECT role FROM admin_sessions WHERE token_hash=$1 AND expires_at>now()",
+                "SELECT u.role FROM admin_sessions s JOIN staff_users u ON u.id=s.user_id WHERE s.token_hash=$1 AND s.expires_at>now() AND u.active AND u.permissions @> '[\"calls.live\"]'::jsonb",
                 token_hash(websocket.cookies.get("vdesk_admin", "")),
             )
             if not role:
@@ -937,7 +1103,7 @@ async def events(websocket: WebSocket, session_id: UUID):
                     event = {"type": "ping"}
                 if auth.get("operator"):
                     valid = await app.state.pool.fetchval(
-                        "SELECT EXISTS(SELECT 1 FROM admin_sessions WHERE token_hash=$1 AND expires_at>now())",
+                        "SELECT EXISTS(SELECT 1 FROM admin_sessions s JOIN staff_users u ON u.id=s.user_id WHERE s.token_hash=$1 AND s.expires_at>now() AND u.active AND u.permissions @> '[\"calls.live\"]'::jsonb)",
                         token_hash(websocket.cookies.get("vdesk_admin", "")),
                     )
                 else:

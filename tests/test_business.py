@@ -59,11 +59,13 @@ async def test_distinct_keys_same_draft_one_booking(business, session):
     assert len({r["action_id"] for r in results}) == 1
 
 
-async def test_racing_clients_only_one_gets_slot(business, session):
+@pytest.mark.parametrize("offset_minutes", [0, 15])
+async def test_racing_clients_only_one_gets_slot(business, session, offset_minutes):
     other = await business.new_session("chat", True)
     when = await available_slot(business)
+    other_when = (datetime.fromisoformat(when) + timedelta(minutes=offset_minutes)).isoformat()
     a, b = await asyncio.gather(
-        draft(business, session["uuid"], when), draft(business, UUID(other["id"]), when)
+        draft(business, session["uuid"], when), draft(business, UUID(other["id"]), other_when)
     )
     results = await asyncio.gather(
         business.confirm(session["uuid"], UUID(a["id"]), a["revision"], uuid4()),
@@ -71,8 +73,46 @@ async def test_racing_clients_only_one_gets_slot(business, session):
         return_exceptions=True,
     )
     assert sum(isinstance(r, dict) for r in results) == 1
-    assert next(r for r in results if isinstance(r, AppError)).code == "slot_taken"
+    errors = [r for r in results if isinstance(r, Exception)]
+    assert len(errors) == 1 and isinstance(errors[0], AppError), results
+    assert errors[0].code == "slot_taken"
     assert await business.pool.fetchval("SELECT count(*) FROM actions") == 1
+    assert await business.pool.fetchval("SELECT count(*) FROM bookings") == 1
+    assert await business.pool.fetchval("SELECT count(*) FROM requests") == 1
+    assert await business.pool.fetchval("SELECT count(*) FROM outbox") == 3
+
+
+async def test_racing_reschedule_and_new_booking_only_one_gets_slot(business, session):
+    when = await available_slot(business)
+    original = await draft(business, session["uuid"], when)
+    booking = await business.confirm(
+        session["uuid"], UUID(original["id"]), original["revision"], uuid4()
+    )
+    target = datetime.fromisoformat(when) + timedelta(hours=2)
+    other = await business.new_session("chat", True)
+    pending = await draft(business, UUID(other["id"]), (target + timedelta(minutes=15)).isoformat())
+    results = await asyncio.gather(
+        business.change_booking(
+            ManagementChange(
+                token=booking["management_token"], operation="reschedule", starts_at=target,
+                revision=1, confirm=True,
+            )
+        ),
+        business.confirm(UUID(other["id"]), UUID(pending["id"]), pending["revision"], uuid4()),
+        return_exceptions=True,
+    )
+    assert sum(isinstance(r, dict) for r in results) == 1
+    errors = [r for r in results if isinstance(r, Exception)]
+    assert len(errors) == 1 and isinstance(errors[0], AppError), results
+    assert errors[0].code == "slot_taken"
+    expected_bookings = 1 + isinstance(results[1], dict)
+    for table in ("actions", "bookings", "requests"):
+        assert await business.pool.fetchval(f"SELECT count(*) FROM {table}") == expected_bookings
+    assert await business.pool.fetchval("SELECT count(*) FROM outbox") == 3 * expected_bookings
+    current = await business.management(booking["management_token"])
+    assert datetime.fromisoformat(current["starts_at"]) == (
+        target if isinstance(results[0], dict) else datetime.fromisoformat(when)
+    )
 
 
 async def test_overlap_different_start_times_rejected(business, session):

@@ -36,7 +36,13 @@ def main():
         raise SystemExit("Use a private Wi-Fi address")
     runtime = ROOT / ".runtime"
     runtime.mkdir(exist_ok=True)
-    ca = runtime / "lan-ca"
+    private = Path.home() / ".cache/voice-desk/private"
+    private.mkdir(parents=True, exist_ok=True, mode=0o700)
+    private.chmod(0o700)
+    ca = private / "lan-ca"
+    old_ca = runtime / "lan-ca"
+    if not ca.exists() and old_ca.exists():
+        shutil.copytree(old_ca, ca)
     ca.mkdir(exist_ok=True, mode=0o700)
     ca.chmod(0o700)
     subprocess.run(
@@ -45,7 +51,7 @@ def main():
             "-cert-file",
             str(runtime / "lan-server.pem"),
             "-key-file",
-            str(runtime / "lan-server-key.pem"),
+            str(private / "lan-server-key.pem"),
             ip,
             "localhost",
             "127.0.0.1",
@@ -53,7 +59,8 @@ def main():
         env={**os.environ, "CAROOT": str(ca)},
         check=True,
     )
-    (runtime / "lan-server-key.pem").chmod(0o600)
+    (private / "lan-server-key.pem").chmod(0o600)
+    (ca / "rootCA-key.pem").chmod(0o600)
     certificate = x509.load_pem_x509_certificate((ca / "rootCA.pem").read_bytes())
     der = certificate.public_bytes(serialization.Encoding.DER)
     public = runtime / "mobile-public"
@@ -110,13 +117,16 @@ https://"""
     caddy_config = (
         config_path.read_text()
         .replace("/certs/lan-server.pem", str(runtime / "lan-server.pem"))
-        .replace("/certs/lan-server-key.pem", str(runtime / "lan-server-key.pem"))
+        .replace("/certs/lan-server-key.pem", str(private / "lan-server-key.pem"))
     )
     caddy_config = caddy_config.replace(
         "    reverse_proxy 127.0.0.1:7860", "    bind 127.0.0.1 " + ip + "\n    reverse_proxy 127.0.0.1:7860"
     )
     config_path.write_text(caddy_config)
     subprocess.run(["caddy", "validate", "--config", str(config_path), "--adapter", "caddyfile"], check=True)
+    for old_key in (runtime / "lan-server-key.pem", old_ca / "rootCA-key.pem"):
+        if old_key.exists():
+            old_key.unlink()
     configure_env(
         {
             "ALLOWED_ORIGINS": f"http://127.0.0.1:7860,http://localhost:7860,{url},https://127.0.0.1:8443,https://localhost:8443",

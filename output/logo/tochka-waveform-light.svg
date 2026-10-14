@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="180 115 1708 436" role="img" aria-labelledby="title desc">
+<title id="title">Точка</title>
+<desc id="desc">Слово ТОЧКА из вертикальных полос звуковой волны.</desc>
+<path fill="#f2f0f4" d="M180 115h1708v436H180z"/>
+<g fill="#2f2838">
+<g id="wave-in">
+<rect x="246" y="329" width="16" height="18" rx="8"/>
+<rect x="274" y="322" width="16" height="32" rx="8"/>
+<rect x="302" y="314" width="16" height="48" rx="8"/>
+<rect x="330" y="302" width="16" height="72" rx="8"/>
+<rect x="358" y="295" width="16" height="86" rx="8"/>
+</g>
+<g id="letter-t">
+<rect x="394" y="228" width="16" height="28" rx="8"/>
+<rect x="420" y="220" width="16" height="44" rx="8"/>
+<rect x="446" y="212" width="16" height="60" rx="8"/>
+<rect x="472" y="205" width="16" height="245" rx="8"/>
+<rect x="498" y="197" width="16" height="264" rx="8"/>
+<rect x="524" y="205" width="16" height="245" rx="8"/>
+<rect x="550" y="212" width="16" height="60" rx="8"/>
+<rect x="576" y="220" width="16" height="44" rx="8"/>
+<rect x="602" y="228" width="16" height="28" rx="8"/>
+</g>
+<g id="letter-o">
+<rect x="628" y="298" width="16" height="68" rx="8"/>
+<rect x="654" y="262" width="16" height="141" rx="8"/>
+<rect x="680" y="234" width="16" height="198" rx="8"/>
+<rect x="706" y="220" width="16" height="72" rx="8"/>
+<rect x="706" y="372" width="16" height="73" rx="8"/>
+<rect x="732" y="208" width="16" height="61" rx="8"/>
+<rect x="732" y="396" width="16" height="61" rx="8"/>
+<rect x="758" y="197" width="16" height="60" rx="8"/>
+<rect x="758" y="406" width="16" height="62" rx="8"/>
+<rect x="784" y="208" width="16" height="61" rx="8"/>
+<rect x="784" y="396" width="16" height="61" rx="8"/>
+<rect x="810" y="220" width="16" height="72" rx="8"/>
+<rect x="810" y="372" width="16" height="73" rx="8"/>
+<rect x="836" y="234" width="16" height="198" rx="8"/>
+<rect x="862" y="262" width="16" height="141" rx="8"/>
+<rect x="888" y="298" width="16" height="68" rx="8"/>
+</g>
+<g id="letter-che">
+<rect x="930" y="213" width="16" height="112" rx="8"/>
+<rect x="956" y="201" width="16" height="150" rx="8"/>
+<rect x="982" y="220" width="16" height="154" rx="8"/>
+<rect x="1008" y="315" width="16" height="66" rx="8"/>
+<rect x="1034" y="315" width="16" height="66" rx="8"/>
+<rect x="1060" y="229" width="16" height="216" rx="8"/>
+<rect x="1086" y="209" width="16" height="241" rx="8"/>
+<rect x="1112" y="201" width="16" height="260" rx="8"/>
+</g>
+<g id="letter-ka">
+<rect x="1178" y="212" width="16" height="238" rx="8"/>
+<rect x="1204" y="199" width="16" height="262" rx="8"/>
+<rect x="1230" y="212" width="16" height="238" rx="8"/>
+<rect x="1256" y="271" width="16" height="120" rx="8"/>
+<rect x="1282" y="243" width="16" height="177" rx="8"/>
+<rect x="1308" y="225" width="16" height="85" rx="8"/>
+<rect x="1308" y="349" width="16" height="92" rx="8"/>
+<rect x="1334" y="209" width="16" height="66" rx="8"/>
+<rect x="1334" y="384" width="16" height="73" rx="8"/>
+<rect x="1360" y="202" width="16" height="38" rx="8"/>
+<rect x="1360" y="416" width="16" height="52" rx="8"/>
+</g>
+<g id="letter-a">
+<rect x="1412" y="411" width="16" height="40" rx="8"/>
+<rect x="1438" y="349" width="16" height="112" rx="8"/>
+<rect x="1464" y="292" width="16" height="158" rx="8"/>
+<rect x="1490" y="247" width="16" height="176" rx="8"/>
+<rect x="1516" y="213" width="16" height="113" rx="8"/>
+<rect x="1516" y="351" width="16" height="52" rx="8"/>
+<rect x="1542" y="197" width="16" height="96" rx="8"/>
+<rect x="1542" y="351" width="16" height="52" rx="8"/>
+<rect x="1568" y="213" width="16" height="113" rx="8"/>
+<rect x="1568" y="351" width="16" height="52" rx="8"/>
+<rect x="1594" y="247" width="16" height="176" rx="8"/>
+<rect x="1620" y="292" width="16" height="158" rx="8"/>
+<rect x="1646" y="349" width="16" height="112" rx="8"/>
+<rect x="1672" y="411" width="16" height="40" rx="8"/>
+</g>
+<g id="wave-out">
+<rect x="1684" y="298" width="16" height="83" rx="8"/>
+<rect x="1712" y="304" width="16" height="71" rx="8"/>
+<rect x="1740" y="315" width="16" height="49" rx="8"/>
+<rect x="1768" y="326" width="16" height="30" rx="8"/>
+<rect x="1796" y="332" width="16" height="18" rx="8"/>
+</g>
+</g>
+</svg>

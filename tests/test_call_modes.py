@@ -84,7 +84,7 @@ async def test_external_consent_gates_storage_and_actions(business):
     assert not await business.pool.fetchval("SELECT consent FROM sessions WHERE id=$1", sid)
     second = await business.new_transport_session("sip", "male")
     sid = UUID(second["id"])
-    manager.runtime[sid] = {"needs_consent": True, "worker": Worker()}
+    manager.runtime[sid] = {"needs_consent": True, "worker": Worker(), "speech_after_notice": True}
     await manager.handle_consent(sid, "да я согласен")
     assert await business.pool.fetchval("SELECT consent FROM sessions WHERE id=$1", sid)
     assert not manager.runtime[sid]["needs_consent"]

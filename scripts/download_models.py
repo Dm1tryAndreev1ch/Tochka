@@ -15,13 +15,39 @@ def get_json(url):
         return json.load(response)
 
 
-def download(repo, revision, filename, local, license_name):
+def download_destination(destination=None):
+    """Validate an explicit storage directory before any network or file writes."""
+    if destination is None:
+        return DEST
+    directory = Path(destination).expanduser()
+    if not directory.is_dir():
+        raise FileNotFoundError(f"Model directory is unavailable: {directory}")
+    directory = directory.resolve(strict=True)
+    if directory.parts[:2] == ("/", "Volumes") and len(directory.parts) >= 3:
+        volume = Path(*directory.parts[:3])
+        if not volume.is_mount():
+            raise FileNotFoundError(f"External volume is not mounted: {volume}")
+    return directory
+
+
+def download(repo, revision, filename, local, license_name, *, destination=None):
+    directory = download_destination(destination)
+    relative = Path(local)
+    if relative.is_absolute() or ".." in relative.parts:
+        raise ValueError("Model filename must remain inside its destination")
+    target = directory / relative
+    part = target.with_suffix(target.suffix + ".part")
+    if destination is not None and any(
+        not candidate.resolve().is_relative_to(directory) for candidate in (target, part)
+    ):
+        raise ValueError("Model destination symlink escapes the selected directory")
     info = get_json(
         f"https://huggingface.co/api/models/{repo}/tree/{revision}/{filename.rsplit('/', 1)[0] if '/' in filename else ''}?expand=true"
     )
     fileinfo = next(item for item in info if item.get("path") == filename)
     expected = fileinfo.get("lfs", {}).get("oid")
-    target = DEST / local
+    if destination is not None:
+        download_destination(destination)
     target.parent.mkdir(parents=True, exist_ok=True)
     if (
         target.exists()
@@ -31,7 +57,6 @@ def download(repo, revision, filename, local, license_name):
         print(f"Verified {local}", flush=True)
     else:
         url = f"https://huggingface.co/{repo}/resolve/{revision}/{filename}"
-        part = target.with_suffix(target.suffix + ".part")
         digest = hashlib.sha256()
         print(f"Downloading {local}: {fileinfo['size'] / 1024**2:.0f} MB", flush=True)
         with urllib.request.urlopen(url, timeout=120) as response, part.open("wb") as output:
@@ -52,6 +77,7 @@ def download(repo, revision, filename, local, license_name):
         "sha256": sha,
         "bytes": target.stat().st_size,
         "license": license_name,
+        "path": str(target.resolve()),
     }
 
 

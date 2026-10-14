@@ -11,11 +11,12 @@ for (const [profile, name] of [['male', 'Геннадий'], ['female', 'Мар�
       viewport: {width: 390, height: 844}, isMobile: true, hasTouch: true});
     const page = await context.newPage();
     try {
-      await page.goto('https://192.168.1.119:8443/');
+      await page.goto(process.env.VOICE_BASE_URL||'https://127.0.0.1:8443/');
       await expect(page.locator('#health-label')).toContainText('на связи', {timeout: 30000});
       await page.locator(`[data-voice="${profile}"]`).click();
       await page.locator('#consent').check();
       const created = page.waitForResponse(r => r.url().endsWith('/api/v1/sessions') && r.request().method() === 'POST');
+      const receipt = page.waitForResponse(r => r.url().includes('/playbacks/') && r.request().method() === 'PUT' && r.status()===200, {timeout:60000});
       await page.locator('#start-call').click();
       const session = await (await created).json();
       expect(session.voice_profile).toBe(profile);
@@ -40,6 +41,7 @@ for (const [profile, name] of [['male', 'Геннадий'], ['female', 'Мар�
       expect(heard).toBe(true);
       await expect(page.locator('#transcript')).toContainText(/какой ваш адрес/i, {timeout: 45000});
       await expect(page.locator('#transcript')).toContainText(/Минск/, {timeout: 15000});
+      expect((await (await receipt).json()).played_chars).toBeGreaterThan(0);
       await page.locator('#end-call').click();
       await expect(page.locator('#call-controls')).toBeHidden();
     } finally {

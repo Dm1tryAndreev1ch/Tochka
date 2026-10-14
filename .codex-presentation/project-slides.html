@@ -1,0 +1,96 @@
+<section class="slide workspace" data-title="Кабинет и управление" hidden>
+<header class="slide-head"><span class="kicker">04 / Работа под контролем</span><span class="page"></span></header>
+<h2 class="title reveal">От звонка до действия.<br><span>В одном рабочем контуре.</span></h2>
+<p class="sub reveal">Целевая операторская версия объединяет обращения, сотрудников, знания и аналитику.</p>
+<div class="work-grid reveal"><article><span class="small-label">Работа</span><h3>Обращения и очередь</h3><p>Статусы, расписание, история диалога, передача сотруднику и обратный звонок.</p></article><article><span class="small-label">Управление</span><h3>Агенты и знания</h3><p>Инструкции, опубликованные сведения, разрешённые действия и версии настроек.</p></article><article><span class="small-label">Компания</span><h3>Права и архив</h3><p>Персональные учётки, роли, цель доступа к записи и журнал действий.</p></article><article><span class="small-label">Аналитика</span><h3>Время и ресурсы</h3><p>Длительность разговора, ожидание, обращения и фактический расход LLM-токенов.</p></article></div>
+<footer class="slide-foot">Основа этих разделов есть в текущем коде. Полный операторский контур входит в целевой релиз.</footer>
+</section>
+<section class="slide dark actual-architecture" data-title="Архитектура продукта" hidden>
+<header class="slide-head"><span class="kicker">05 / Локальное ядро</span><span class="page"></span></header>
+<h2 class="title reveal">Один разговорный интеллект.<br><span>Быстрый путь для типовых действий.</span></h2><p class="sub reveal">Текущая база: Whisper, Qwen3-4B, Qwen3-TTS. Платные модельные API не нужны.</p>
+<div class="architecture-route reveal"><div class="architecture-stop"><span class="number">01</span><h3>Речь</h3><p>STT<br>Whisper</p></div><div class="architecture-branch"><div><span class="small-label">Типовая задача</span><h3>Правила и факты</h3><p>Запись, контакт, передача человеку</p></div><div><span class="small-label">Свободный запрос</span><h3>Локальная LLM</h3><p>Qwen3-4B и контекст диалога</p></div></div><div class="architecture-stop"><span class="number">02</span><h3>Действие</h3><p>Серверная проверка<br>и подтверждение</p></div><div class="architecture-stop"><span class="number">03</span><h3>Ответ</h3><p>Qwen3-TTS<br>резерв Piper</p></div></div>
+<footer class="slide-foot">Быстрые правила и одна LLM уже образуют ядро. Разделение на две разные LLM не заявляется.</footer>
+</section>
+<section class="slide requirements" data-title="Соответствие ТЗ: продукт" hidden>
+<header class="slide-head"><span class="kicker">07 / Требования продукта</span><span class="page"></span></header>
+<h2 class="title reveal">ТЗ превращается в поведение</h2><p class="sub reveal">Покрытие в целевом релизе. Проверяем каждый результат, а не только наличие экрана.</p>
+<div class="trace-table reveal"><div class="trace-row trace-header"><span>Пункт ТЗ</span><span>Требование</span><span>Решение в целевом релизе</span></div><div class="trace-row"><span>§4.2–4.3</span><h3>Диалог и достоверность</h3><p>Контекст, перебивания, факты из знаний, разрешённые действия.</p></div><div class="trace-row"><span>§4.4–4.5</span><h3>Чат и сотрудник</h3><p>Проверенный получатель, передача контекста и резервный сценарий.</p></div><div class="trace-row"><span>§5.1–5.4</span><h3>Качество понимания</h3><p>Отдельные пороги ASR и NLU, подтверждение критичных полей.</p></div><div class="trace-row"><span>§6.2–6.4</span><h3>Управление и история</h3><p>Сценарии, версии, карточка звонка, маршрут и результат.</p></div><div class="trace-row"><span>§7–8</span><h3>Данные и доступ</h3><p>Согласия, сроки хранения, роли, шифрование и аудит.</p></div></div>
+<footer class="slide-foot">Полная матрица охватывает 56 разделов/подразделов ТЗ. Она доступна через «Основание».</footer>
+</section>
+<section class="slide requirements" data-title="Соответствие ТЗ: оператор" hidden>
+<header class="slide-head"><span class="kicker">08 / Операторский контур</span><span class="page"></span></header>
+<h2 class="title reveal">Услуга внутри экосистемы МТС</h2><p class="sub reveal">Целевой состав релиза включает весь жизненный цикл абонентской услуги.</p>
+<div class="trace-table reveal"><div class="trace-row trace-header"><span>Пункт ТЗ</span><span>Требование</span><span>Решение в целевом релизе</span></div><div class="trace-row"><span>§2, §6.1</span><h3>Абонент и номер</h3><p>SSO МТС, проверка владения номером, организации и роли.</p></div><div class="trace-row"><span>§3.1–3.4</span><h3>Подключение и отключение</h3><p>Мастер до 5 минут, состояния услуги и возврат обычного маршрута.</p></div><div class="trace-row"><span>§4.1, §9</span><h3>Телефония и маршруты</h3><p>Правила по номеру, времени, категории, доступности и тарифу.</p></div><div class="trace-row"><span>§10.1–10.4</span><h3>Биллинг и партнёрство</h3><p>Начисления, лимиты, баланс, сверка, корректировки и доли.</p></div><div class="trace-row"><span>§11–16</span><h3>Промышленная работа</h3><p>Масштабирование, мониторинг, восстановление и комплект приёмки.</p></div></div>
+<footer class="slide-foot">Это целевое покрытие. Подключение к системам МТС и промышленная приёмка требуют совместного внедрения.</footer>
+</section>
+<section class="slide dark quality" data-title="Критерии качества" hidden>
+<header class="slide-head"><span class="kicker">09 / Уверенность в разговоре</span><span class="page"></span></header>
+<h2 class="title reveal">Два независимых порога качества</h2><p class="sub reveal">Обязательные критерии целевого релиза в сложных условиях</p>
+<div class="quality-numbers reveal"><div><div class="quality-value">≥94<span>%</span></div><h3>Точность слов</h3><p>ASR: WER не выше 6%</p></div><div><div class="quality-value">≥94<span>%</span></div><h3>Точность намерения</h3><p>По фактической расшифровке аудио</p></div></div>
+<div class="quality-context reveal"><span>Улица и офис</span><span>Эхо</span><span>Быстрая речь</span><span>Паузы</span><span>Телефон 8 кГц</span></div>
+<footer class="slide-foot">Порог одного показателя не заменяет другой. Значения здесь — требования к приёмке, не достигнутые результаты.</footer>
+</section>
+<section class="slide data-security" data-title="Защита данных" hidden>
+<header class="slide-head"><span class="kicker">10 / Доверие по умолчанию</span><span class="page"></span></header>
+<h2 class="title reveal">Данные под контролем.<br><span>Доступ по назначению.</span></h2>
+<div class="security-flow reveal"><article><span class="number">01 / До разговора</span><h3>Понятное согласие</h3><p>Предупреждение об обработке данных. Аудиозапись только после устного разрешения.</p></article><article><span class="number">02 / Во время работы</span><h3>Минимальные права</h3><p>Персональные сотрудники, разрешённые действия, отзыв сессий и изоляция организаций.</p></article><article><span class="number">03 / После звонка</span><h3>Защищённый архив</h3><p>Шифрование, цель доступа, сроки хранения и контролируемое удаление копий.</p></article></div>
+<footer class="slide-foot">Часть механизмов уже реализована. Изоляция абонентов, полный цикл копий и юридическая модель входят в операторский релиз.</footer>
+</section>
+<section class="slide dark reliability" data-title="Надёжность и приёмка" hidden>
+<header class="slide-head"><span class="kicker">11 / Работа при сбоях</span><span class="page"></span></header>
+<div class="reliability-layout"><div class="reveal"><h2>Сервис продолжает<br><span>заботу о звонке.</span></h2><p>При сбое модели, CRM или узла клиент получает предусмотренный исход: повтор, человека или обратный звонок.</p><div class="sla-target"><strong>99,9%</strong><span>ориентир доступности<br>для согласования SLA</span></div></div><div class="reliability-list reveal"><div><span class="number">01</span><h3>Резервный маршрут</h3><p>Возврат в обычную телефонию при отказе ИИ.</p></div><div><span class="number">02</span><h3>Восстановление</h3><p>Backup, ключи, CRM и проверка целостности после восстановления.</p></div><div><span class="number">03</span><h3>Доказанная приёмка</h3><p>300 latency-замеров, устройства, пик нагрузки и 8-часовой прогон.</p></div></div></div>
+<footer class="slide-foot">Доступность — целевой ориентир, не обещание текущей версии. Границы SLA/RTO/RPO фиксируются с МТС.</footer>
+</section>
+<section class="slide partnership" data-title="Роли команды и МТС" hidden>
+<header class="slide-head"><span class="kicker">12 / Партнёрская модель</span><span class="page"></span></header>
+<h2 class="title reveal">Точка создаёт продукт.<br><span>МТС даёт операторский контур.</span></h2>
+<div class="partner-columns reveal"><article><span class="small-label">Команда Точки</span><h3>Продукт и качество</h3><p>Голосовое ядро, знания, сценарии, кабинет, интеграционные адаптеры и развитие.</p><p>Регрессии, ASR/NLU, эксплуатационные инструкции и сопровождение приложения.</p></article><article><span class="small-label">Партнёр МТС</span><h3>Номер и инфраструктура</h3><p>SSO, владение номером, телефония, биллинг, выделение вычислительных ресурсов.</p><p>Операторские процессы, сеть, размещение, поддержка и согласованная модель данных.</p></article></div>
+<footer class="slide-foot">Распределение ответственности и расходов — предложение для договора, не действующее соглашение.</footer>
+</section>
+<section class="slide roadmap" data-title="План операторского запуска" hidden>
+<header class="slide-head"><span class="kicker">13 / Внедрение по результатам</span><span class="page"></span></header>
+<h2 class="title reveal">Четыре этапа до операторского запуска</h2><p class="sub reveal">От кодовой основы к проверенной услуге. Ожидание интеграций МТС учитывается отдельно.</p>
+<div class="delivery-stages reveal"><article><span class="number">01</span><h3>Контракты</h3><p>Номера, SSO, телефония, тариф, данные и критерии приёмки.</p><small>D00, D09–D12</small></article><article><span class="number">02</span><h3>Интеграции</h3><p>Жизненный цикл, маршруты, чат, биллинг, кабинет и защита.</p><small>D11–D20</small></article><article><span class="number">03</span><h3>Пилот</h3><p>Качество, устройства, нагрузка, восстановление и финансовая сверка.</p><small>D01–D08, D21–D28</small></article><article><span class="number">04</span><h3>Расширение</h3><p>Ёмкость, новые сценарии, аналитика и партнёрские расчёты.</p><small>D23–D25, D29</small></article></div>
+<footer class="slide-foot">Этапы привязаны к D00–D29. Часы следующего слайда — инженерная оценка, не гарантированный срок.</footer>
+</section>
+<section class="slide dark development-budget" data-title="Бюджет внедрения" hidden>
+<header class="slide-head"><span class="kicker">14 / Разовые затраты</span><span class="page"></span></header>
+<h2 class="title reveal">Бюджет операторского внедрения</h2><p class="sub reveal">Оценка доведения текущей кодовой основы до целевого операторского релиза</p>
+<div class="budget-range reveal"><span>126–232</span><p>тыс. BYN<br>до налоговых корректировок</p></div>
+<div class="budget-parts reveal"><article><h3>100,8–180,8 тыс.</h3><p>Разработка и приёмка<br>1 260–2 260 часов × 80 BYN</p></article><article><h3>20,2–36,2 тыс.</h3><p>Резерв неопределённости<br>20% от трудозатрат</p></article><article><h3>5–15 тыс.</h3><p>Внешняя подготовка<br>документы, доступы, стенд</p></article></div>
+<footer class="slide-foot">Оценка автора. Ставка 80 BYN/ч — бюджетное допущение. Фактические прошлые расходы неизвестны.</footer>
+</section>
+<section class="slide work-budget" data-title="Трудозатраты по направлениям" hidden>
+<header class="slide-head"><span class="kicker">15 / За что платим</span><span class="page"></span></header>
+<h2 class="title reveal">Восемь направлений работы</h2><p class="sub reveal">Без двойного учёта: каждому направлению выделен собственный бюджет часов.</p>
+<div class="effort-list reveal" id="effort-list"></div>
+<footer class="slide-foot">Общий диапазон: 1 260–2 260 часов, или 7,9–14,1 человеко-месяца по 160 часов. Это не календарный срок команды.</footer>
+</section>
+<section class="slide operating-budget" data-title="Ежемесячные затраты" hidden>
+<header class="slide-head"><span class="kicker">16 / Эксплуатация</span><span class="page"></span></header>
+<h2 class="title reveal">Ресурсы МТС тоже имеют стоимость</h2><p class="sub reveal">Опорный пример: один активный GPU-узел и один резервный. Ёмкость уточняется нагрузкой.</p>
+<div class="opex-grid reveal"><article><span class="small-label">Два GPU-узла</span><h3>1 166–3 845 BYN</h3><p>720 ч/мес. × $0,27–0,89 × 2 × 3 BYN/$</p></article><article><span class="small-label">CPU, БД и сеть</span><h3>150–450 BYN</h3><p>Бюджетное допущение для сервисного слоя</p></article><article><span class="small-label">Архив и backup</span><h3>30–90 BYN</h3><p>Бюджет хранения и защищённых копий</p></article><article><span class="small-label">Сопровождение</span><h3>2 560–5 120 BYN</h3><p>32–64 ч/мес. × 80 BYN/ч</p></article></div>
+<div class="opex-total reveal"><strong>3,9–9,5 тыс. BYN / мес.</strong><span>Телефония, налоги, маркетинг<br>и работа живых операторов отдельно.</span></div>
+<footer class="slide-foot"><a href="https://www.runpod.io/pricing" target="_blank" rel="noopener noreferrer">Runpod</a> — внешний ценовой ориентир 24 GB GPU, не предложение МТС и не схема хранения данных. Курс 3 BYN/$ — плановый.</footer>
+</section>
+<section class="slide capacity" data-title="Ёмкость и нагрузка" hidden>
+<header class="slide-head"><span class="kicker">18 / Масштабирование</span><span class="page"></span></header>
+<h2 class="title reveal">Абоненты не равны одновременным звонкам</h2><p class="sub reveal">Размер инфраструктуры определяет пик нагрузки и измеренная ёмкость рабочего узла.</p>
+<div class="capacity-formula reveal"><div><strong>1 000</strong><p>абонентов</p></div><span>×</span><div><strong>30</strong><p>минут / мес.</p></div><span>=</span><div><strong>30 000</strong><p>минут диалога / мес.</p></div></div>
+<div class="capacity-bottom reveal"><article><h3>Плановый пик: 5 звонков</h3><p>30 дней × 10 активных часов, коэффициент пика 3. Целочисленная ёмкость округляется вверх.</p></article><article><h3>Сначала измерить worker</h3><p>Число параллельных разговоров на GPU — параметр испытаний. Добавляется резервный узел.</p></article></div>
+<footer class="slide-foot">В локальной основе один активный голосовой разговор и FIFO-очередь. Промышленная многосессионность — целевая архитектура.</footer>
+</section>
+<section class="slide calculator" data-title="Калькулятор экономики" hidden>
+<header class="slide-head"><span class="kicker">19 / Экономика без нулевых затрат</span><span class="page"></span></header>
+<h2 class="title reveal">Экономика зависит от условий партнёрства</h2><p class="sub reveal">План: тариф 9,90 BYN, доли 50/50. МТС оплачивает инфраструктуру, команда — сопровождение.</p>
+<form class="economy-inputs reveal" aria-label="Параметры финансовой модели"><label>Абонентов<input id="budget-subs" type="number" min="1" max="100000" step="100" value="1000"></label><label>Минут на абонента / мес.<input id="budget-minutes" type="number" min="1" max="1000" value="10"></label><label>Разговоров на worker<input id="budget-capacity" type="number" min="1" max="20" value="1"></label><label>GPU, USD / час<input id="budget-gpu" type="number" min="0.01" max="20" step="0.01" value="0.27"></label><label>Сопровождение, ч / мес.<input id="budget-support" type="number" min="0" max="500" value="32"></label><label>Ставка, BYN / час<input id="budget-rate" type="number" min="1" max="500" value="80"></label></form>
+<div class="economy-results reveal" aria-live="polite" aria-atomic="true"><article><span>Общая выручка</span><strong id="budget-revenue">9 900 BYN</strong><small id="budget-resources">3 GPU-узла, включая резерв</small></article><article><span>Общие расходы</span><strong id="budget-cost">4 670 BYN</strong><small id="budget-margin-mts">Остаток МТС: 2 840 BYN</small></article><article><span>Остаток до прочих затрат</span><strong id="budget-total-margin">5 230 BYN</strong><small id="budget-margin-team">Остаток команды: 2 390 BYN</small></article></div>
+<div class="budget-presets"><button type="button" data-budget="pilot">100 абонентов</button><button type="button" data-budget="base">1 000 × 10 минут</button><button type="button" data-budget="load">1 000 × 30 минут</button><button type="button" data-budget="high">Дорогой GPU</button></div>
+<footer class="slide-foot">Модель, не прогноз прибыли. Курс 3 BYN/$; CPU/БД 300, архив 60 BYN/мес.; пик ×3, 30×10 активных часов. Налоги, SIP, маркетинг и возврат инвестиций исключены.</footer>
+</section>
+<section class="slide evidence-summary" data-title="Основание и допущения" hidden>
+<header class="slide-head"><span class="kicker">22 / Прозрачная модель</span><span class="page"></span></header>
+<h2 class="title reveal">Целевой продукт.<br><span>Проверяемые основания.</span></h2>
+<div class="basis-grid reveal"><article><span class="small-label">Объём</span><h3>ТЗ и код</h3><p>Исходное операторское ТЗ, D00–D29, актуальная кодовая основа и передача разработки от 13 октября 2026.</p></article><article><span class="small-label">Качество</span><h3>Пороги приёмки</h3><p>Два минимума 94% — требования. Итоговая приёмка операторского продукта ещё не завершена.</p></article><article><span class="small-label">Финансы</span><h3>Оценка затрат</h3><p>Часы, ставка, резерв и курс — допущения. GPU — рыночный ориентир; внутреннюю стоимость МТС определяет партнёр.</p></article><article><span class="small-label">Проверка</span><h3>Доказательства</h3><p>Пять фокусных unit-тестов прошли свежим прогоном. Они не заменяют сквозную приёмку голоса, сети и биллинга.</p></article></div>
+<footer class="slide-foot">«Основание» открывает источники, расчёты и полную матрицу 56 пунктов. Презентация описывает целевой релиз.</footer>
+</section>

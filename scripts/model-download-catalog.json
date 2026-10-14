@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "artifacts": [
+    {
+      "file": "whisper-small/model.bin",
+      "repo": "Systran/faster-whisper-small",
+      "revision": "536b0662742c02347bc0e980a01041f333bce120",
+      "source_file": "model.bin",
+      "sha256": "3e305921506d8872816023e4c273e75d2419fb89b24da97b4fe7bce14170d671",
+      "bytes": 483546902,
+      "license": "MIT",
+      "profiles": [
+        "portable"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "whisper-small/config.json",
+      "repo": "Systran/faster-whisper-small",
+      "revision": "536b0662742c02347bc0e980a01041f333bce120",
+      "source_file": "config.json",
+      "sha256": "b55496ac7940a7ae47d2c01eab40edfd8701feec1229d9cce3b40014383fb828",
+      "bytes": 2370,
+      "license": "MIT",
+      "profiles": [
+        "portable"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "whisper-small/tokenizer.json",
+      "repo": "Systran/faster-whisper-small",
+      "revision": "536b0662742c02347bc0e980a01041f333bce120",
+      "source_file": "tokenizer.json",
+      "sha256": "fb7b63191e9bb045082c79fd742a3106a12c99513ab30df4a0d47fa6cb6fd0ab",
+      "bytes": 2203239,
+      "license": "MIT",
+      "profiles": [
+        "portable"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "whisper-small/vocabulary.txt",
+      "repo": "Systran/faster-whisper-small",
+      "revision": "536b0662742c02347bc0e980a01041f333bce120",
+      "source_file": "vocabulary.txt",
+      "sha256": "34ce3fe1c5041027b3f8d42912270993f986dbc4bb34cf27f951e34a1e453913",
+      "bytes": 459861,
+      "license": "MIT",
+      "profiles": [
+        "portable"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "ru_RU-denis-medium.onnx",
+      "repo": "rhasspy/piper-voices",
+      "revision": "c10ece1aade47bb51c153c893d14e5bf8e5b7117",
+      "source_file": "ru/ru_RU/denis/medium/ru_RU-denis-medium.onnx",
+      "sha256": "15fab56e11a097858ee115545d0f697fc2a316c41a291a5362349fb870411b0a",
+      "bytes": 63201294,
+      "license": "MIT (model repository); CC0 (dataset per MODEL_CARD)",
+      "profiles": [
+        "mac-metal",
+        "portable"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "ru_RU-denis-medium.onnx.json",
+      "repo": "rhasspy/piper-voices",
+      "revision": "c10ece1aade47bb51c153c893d14e5bf8e5b7117",
+      "source_file": "ru/ru_RU/denis/medium/ru_RU-denis-medium.onnx.json",
+      "sha256": "831c860dac0b5073eaa81610a0a638ec23d90a6cf8e5f871b4485c2cec3767c8",
+      "bytes": 4823,
+      "license": "MIT (model repository); CC0 (dataset per MODEL_CARD)",
+      "profiles": [
+        "mac-metal",
+        "portable"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "qwen3-4b-q4.gguf",
+      "repo": "unsloth/Qwen3-4B-Instruct-2507-GGUF",
+      "revision": "a06e946bb6b655725eafa393f4a9745d460374c9",
+      "source_file": "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+      "sha256": "3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597",
+      "bytes": 2497281120,
+      "license": "Apache-2.0",
+      "profiles": [
+        "mac-metal",
+        "portable",
+        "llm-worker"
+      ],
+      "checksum_source": "project model-manifest.json",
+      "component": "llm"
+    },
+    {
+      "file": "qwen3-tts-base-0.6b/config.json",
+      "repo": "mlx-community/Qwen3-TTS-12Hz-0.6B-Base-8bit",
+      "revision": "50f45ef0047cde7e84c2ef04326acb8ada2436a7",
+      "source_file": "config.json",
+      "sha256": "b404fb6f99dac6f7a81f3a03af5675b131ecf9936ac75a7c9d75e54044600044",
+      "bytes": 5522,
+      "license": "Apache-2.0",
+      "profiles": [
+        "mac-metal"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "qwen3-tts-base-0.6b/generation_config.json",
+      "repo": "mlx-community/Qwen3-TTS-12Hz-0.6B-Base-8bit",
+      "revision": "50f45ef0047cde7e84c2ef04326acb8ada2436a7",
+      "source_file": "generation_config.json",
+      "sha256": "f1b90b4513f3b34c62851049e2492d7b4c5940daf1276f89c82b8ef04127f3aa",
+      "bytes": 245,
+      "license": "Apache-2.0",
+      "profiles": [
+        "mac-metal"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "qwen3-tts-base-0.6b/merges.txt",
+      "repo": "mlx-community/Qwen3-TTS-12Hz-0.6B-Base-8bit",
+      "revision": "50f45ef0047cde7e84c2ef04326acb8ada2436a7",
+      "source_file": "merges.txt",
+      "sha256": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+      "bytes": 1671839,
+      "license": "Apache-2.0",
+      "profiles": [
+        "mac-metal"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "qwen3-tts-base-0.6b/model.safetensors",
+      "repo": "mlx-community/Qwen3-TTS-12Hz-0.6B-Base-8bit",
+      "revision": "50f45ef0047cde7e84c2ef04326acb8ada2436a7",
+      "source_file": "model.safetensors",
+      "sha256": "9488e7005cc0cf44f8804eb543668d0763bb1c649ce6f1eddc663519524b3182",
+      "bytes": 1304461214,
+      "license": "Apache-2.0",
+      "profiles": [
+        "mac-metal"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "qwen3-tts-base-0.6b/model.safetensors.index.json",
+      "repo": "mlx-community/Qwen3-TTS-12Hz-0.6B-Base-8bit",
+      "revision": "50f45ef0047cde7e84c2ef04326acb8ada2436a7",
+      "source_file": "model.safetensors.index.json",
+      "sha256": "7829f1cc24f5cbd7d7a3ba888bb08c7cf52d82ba79a4f0f3756d41f8bf5e52b4",
+      "bytes": 77731,
+      "license": "Apache-2.0",
+      "profiles": [
+        "mac-metal"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "qwen3-tts-base-0.6b/preprocessor_config.json",
+      "repo": "mlx-community/Qwen3-TTS-12Hz-0.6B-Base-8bit",
+      "revision": "50f45ef0047cde7e84c2ef04326acb8ada2436a7",
+      "source_file": "preprocessor_config.json",
+      "sha256": "efdde1022ea9d76928bf7a9cd53139138f5ba2e466e837f08f6105ab1af1c119",
+      "bytes": 127,
+      "license": "Apache-2.0",
+      "profiles": [
+        "mac-metal"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "qwen3-tts-base-0.6b/speech_tokenizer/config.json",
+      "repo": "mlx-community/Qwen3-TTS-12Hz-0.6B-Base-8bit",
+      "revision": "50f45ef0047cde7e84c2ef04326acb8ada2436a7",
+      "source_file": "speech_tokenizer/config.json",
+      "sha256": "ee65bb901c876664ab8707c487157aa1a6ee57c65969b28fb5ec9dc211e68167",
+      "bytes": 2336,
+      "license": "Apache-2.0",
+      "profiles": [
+        "mac-metal"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "qwen3-tts-base-0.6b/speech_tokenizer/configuration.json",
+      "repo": "mlx-community/Qwen3-TTS-12Hz-0.6B-Base-8bit",
+      "revision": "50f45ef0047cde7e84c2ef04326acb8ada2436a7",
+      "source_file": "speech_tokenizer/configuration.json",
+      "sha256": "6bc26d64eb5024b4d1dab5a52371958b429256d6c9d59787f1f5294a54e0cebd",
+      "bytes": 76,
+      "license": "Apache-2.0",
+      "profiles": [
+        "mac-metal"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "qwen3-tts-base-0.6b/speech_tokenizer/model.safetensors",
+      "repo": "mlx-community/Qwen3-TTS-12Hz-0.6B-Base-8bit",
+      "revision": "50f45ef0047cde7e84c2ef04326acb8ada2436a7",
+      "source_file": "speech_tokenizer/model.safetensors",
+      "sha256": "836b7b357f5ea43e889936a3709af68dfe3751881acefe4ecf0dbd30ba571258",
+      "bytes": 682293092,
+      "license": "Apache-2.0",
+      "profiles": [
+        "mac-metal"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "qwen3-tts-base-0.6b/speech_tokenizer/preprocessor_config.json",
+      "repo": "mlx-community/Qwen3-TTS-12Hz-0.6B-Base-8bit",
+      "revision": "50f45ef0047cde7e84c2ef04326acb8ada2436a7",
+      "source_file": "speech_tokenizer/preprocessor_config.json",
+      "sha256": "fcb3805e597e786d4067706e602f6688524640f8d3396790e2e09b5942fcbdfb",
+      "bytes": 234,
+      "license": "Apache-2.0",
+      "profiles": [
+        "mac-metal"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "qwen3-tts-base-0.6b/tokenizer_config.json",
+      "repo": "mlx-community/Qwen3-TTS-12Hz-0.6B-Base-8bit",
+      "revision": "50f45ef0047cde7e84c2ef04326acb8ada2436a7",
+      "source_file": "tokenizer_config.json",
+      "sha256": "dc3c31c3bdaedd5016382bb3cbe07323026775ad51f5a4fb564505992ae4a670",
+      "bytes": 7344,
+      "license": "Apache-2.0",
+      "profiles": [
+        "mac-metal"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "qwen3-tts-base-0.6b/vocab.json",
+      "repo": "mlx-community/Qwen3-TTS-12Hz-0.6B-Base-8bit",
+      "revision": "50f45ef0047cde7e84c2ef04326acb8ada2436a7",
+      "source_file": "vocab.json",
+      "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+      "bytes": 2776833,
+      "license": "Apache-2.0",
+      "profiles": [
+        "mac-metal"
+      ],
+      "checksum_source": "project model-manifest.json"
+    },
+    {
+      "file": "whisper-turbo-metal.bin",
+      "repo": "ggerganov/whisper.cpp",
+      "revision": "5359861c739e955e79d9a303bcbc70fb988958b1",
+      "source_file": "ggml-large-v3-turbo-q5_0.bin",
+      "sha256": "394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2",
+      "bytes": 574041195,
+      "license": "MIT",
+      "profiles": [
+        "mac-metal"
+      ],
+      "checksum_source": "Hugging Face LFS metadata at pinned revision; retrieved 2026-10-13"
+    },
+    {
+      "file": "voices/metadata.json",
+      "source_file": "app/assets/voices/metadata.json",
+      "sha256": "4723f7bd8f1c1935e6e449015c1e7e6fb105872a3c62347c3e1d39454e022609",
+      "bytes": 1830,
+      "profiles": [
+        "mac-metal"
+      ],
+      "source": "bundled",
+      "checksum_source": "approved bundled reference snapshot 2026-10-13",
+      "license": "project synthetic voice references; see app/assets/voices/metadata.json"
+    },
+    {
+      "file": "voices/male.wav",
+      "source_file": "app/assets/voices/male.wav",
+      "sha256": "8e546cdb166a38b9d09cf38552d8eadb0fa3a37ae382b093d4f37a2cf706ae8f",
+      "bytes": 614444,
+      "profiles": [
+        "mac-metal"
+      ],
+      "source": "bundled",
+      "checksum_source": "approved bundled reference snapshot 2026-10-13",
+      "license": "project synthetic voice references; see app/assets/voices/metadata.json"
+    },
+    {
+      "file": "voices/female.wav",
+      "source_file": "app/assets/voices/female.wav",
+      "sha256": "d03b6de90dbabc16dc0bae0421b99bf513766aac9cf9c97d86d8ada85e6ae35c",
+      "bytes": 618284,
+      "profiles": [
+        "mac-metal"
+      ],
+      "source": "bundled",
+      "checksum_source": "approved bundled reference snapshot 2026-10-13",
+      "license": "project synthetic voice references; see app/assets/voices/metadata.json"
+    }
+  ]
+}
