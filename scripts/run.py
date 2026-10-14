@@ -143,6 +143,20 @@ def ensure_dependencies():
     subprocess.run(["docker", "compose", "up", "-d", "--wait"], cwd=ROOT, check=True, timeout=120)
 
 
+def auto_database_setup_allowed(database_url, config_file, environ=None):
+    """Self-heal only the compose-managed local database configured through the default .env."""
+    environ = os.environ if environ is None else environ
+    if environ.get("VOICE_AUTO_DB_SETUP", "1") == "0" or "DATABASE_URL" in environ:
+        return False
+    if config_file is None or Path(config_file).resolve() != (ROOT / ".env").resolve():
+        return False
+    try:
+        address = urllib.parse.urlsplit(database_url)
+        return address.hostname in ("127.0.0.1", "localhost", "::1") and address.port == 15432
+    except ValueError:
+        return False
+
+
 async def check_database_runtime(database_url):
     import asyncpg
 
@@ -181,7 +195,30 @@ def main():
         except (OSError, urllib.error.URLError, LLMNotReady, LLMConfigurationError) as exc:
             raise RuntimeError("Remote LLM is unavailable or incompatible; no local LLM will be started") from exc
     ensure_dependencies()
-    asyncio.run(check_database_runtime(config.database_url))
+    from app.database_security import DatabaseSecurityError
+    from app.migration_runner import MigrationError
+
+    def database_failure(exc):
+        return SystemExit(
+            f"Database is not ready for the runtime role: {exc}\n"
+            "Run: .venv/bin/python scripts/setup_database.py   (applies migrations and switches DATABASE_URL "
+            "to the unprivileged role; see docs/RUNBOOK.md)"
+        )
+
+    try:
+        asyncio.run(check_database_runtime(config.database_url))
+    except (DatabaseSecurityError, MigrationError) as exc:
+        if not auto_database_setup_allowed(config.database_url, config_file):
+            raise database_failure(exc) from None
+        print(f"Database is not ready for the runtime role ({exc}); running scripts/setup_database.py")
+        if subprocess.run([sys.executable, str(ROOT / "scripts/setup_database.py")], cwd=ROOT).returncode:
+            raise database_failure(exc) from None
+        env = {**dotenv_values(config_file), **os.environ}
+        config = Settings(_env_file=None, **{key.lower(): value for key, value in env.items() if value is not None})
+        try:
+            asyncio.run(check_database_runtime(config.database_url))
+        except (DatabaseSecurityError, MigrationError) as retry_exc:
+            raise database_failure(retry_exc) from None
     child_settings = config.model_dump()
     manifest = collect_runtime_manifest(root=ROOT, config=child_settings)
     manifest_file = ROOT / "artifacts" / "runtime-manifests" / (uuid4().hex + ".json")

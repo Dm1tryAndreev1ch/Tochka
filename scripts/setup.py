@@ -61,6 +61,7 @@ def main():
     run(["brew", "install", "whisper.cpp", "ggml", "rubberband"])
     run([python, "scripts/build_whisper.py"])
     run(["docker", "compose", "up", "-d"])
+    run([python, "scripts/setup_database.py"])
     run([python, "scripts/provision_crm.py"])
     if not args.no_models:
         run([python, "scripts/download_runtime_models.py"])

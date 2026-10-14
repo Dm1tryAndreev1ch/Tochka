@@ -11,6 +11,8 @@ python3.12 scripts/setup.py
 
 Установщик проверяет свободное место, создаёт `.env` со случайными паролями, Python-окружение, PostgreSQL/EspoCRM и API-пользователя, затем загружает около 4.8 ГБ рабочих моделей. Python-окружение размещено в `~/.cache/voice-desk/venv`, чтобы iCloud не выгружал его файлы. В проекте `.venv` — ссылка на него. `requirements.lock` фиксирует точные версии; `model-manifest.json` содержит revisions, размеры и SHA256 весов. Уже установленная модель проверяется перед повторным скачиванием.
 
+Приложение работает только под отдельной непривилегированной ролью БД (`voice_app`), а не под суперпользователем `voice` из compose. `scripts/setup.py` делает это сам. Если запуск пишет «Runtime database role must be an unprivileged login» (например, `.env` создан раньше), выполните `.venv/bin/python scripts/setup_database.py`: он применит миграции, создаст роль и заменит только строку `DATABASE_URL` в `.env`. Для базы, созданной до появления контрольных сумм миграций, сделайте backup и добавьте `--adopt-legacy-checksums`. `Launch.command`, `Start.command` и `scripts/run.py` запускают этот скрипт сами, но только для локальной БД из compose (порт 15432) и обычного `.env`; отключить — `VOICE_AUTO_DB_SETUP=0`. Контрольные суммы старой базы автоматически никогда не принимаются.
+
 ```sh
 .venv/bin/python scripts/run.py
 ```
